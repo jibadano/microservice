@@ -1,8 +1,8 @@
-require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const jwt = require('express-jwt')
 const { ApolloServer } = require('apollo-server-express')
+
 const Config = require('./config')
 const Model = require('./model')
 const Controller = require('./controller')
