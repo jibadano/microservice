@@ -4,9 +4,10 @@ const env = process.env.NODE_ENV || 'development'
 const path = require('path')
 
 module.exports = class Config {
-	constructor(config) {
+	constructor(config, name = 'default') {
+		this.name = name
 		try {
-			this.values = require(path.resolve('src/config/default.json'))
+			this.values = require(path.resolve('default.json'))
 		} catch (e) { }
 
 		if (config instanceof String)
@@ -22,7 +23,7 @@ module.exports = class Config {
 	}
 
 	get(param) {
-		const key = env + (param ? `.${param}` : '')
+		const key = env + (param ? `.${this.name}.${param}` : '')
 		return get(this.values, key)
 	}
 
