@@ -12,7 +12,8 @@ module.exports = class Microservice {
     this.config = new Config(config)
   }
 
-  init() {
+  async init() {
+    await this.config.init()
     this.model = new Model(this.config)
     this.controller = new Controller(this.config)
 
