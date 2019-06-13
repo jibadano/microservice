@@ -52,7 +52,7 @@ module.exports = class Config {
 	}
 
 	async init() {
-		console.inf(`⚙️Config init for ${this.moduleName} ${this.remoteUrl}`)
+		console.info(`⚙️Config init for ${this.moduleName} ${this.remoteUrl}`)
 		await this.refresh()
 	}
 
