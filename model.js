@@ -5,7 +5,7 @@ const path = require('path')
 module.exports = class Model {
 	constructor(config) {
 		console.info(`🌎 Model init`)
-		mongoose.connect(config.get('mongo'))
+		mongoose.connect(config.get('mongo'), { useNewUrlParser: true })
 			.then(() => console.info(`🌎 Model db connected`))
 			.catch(console.error)
 

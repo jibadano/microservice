@@ -5,7 +5,7 @@ const merge = require('lodash/merge')
 const environments = ["development", "staging", "production"]
 
 if (process.env.NODE_ENV && !environments.includes(process.env.NODE_ENV))
-	console.warn(`⚙️ Config ${proces.env.NODE_ENV} environment not available`)
+	console.warn(`⚙️ Config ${process.env.NODE_ENV} environment not available`)
 
 const env = process.env.NODE_ENV || 'development'
 
