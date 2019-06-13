@@ -60,7 +60,7 @@ module.exports = class Config {
 					for (let mod in values[env]) {
 						const modConfig = values[env][mod]
 						if (mod != 'default')
-							values[env][mod] = merge(def, modConfig)
+							values[env][mod] = merge({ ...def }, modConfig)
 					}
 			}
 		}
