@@ -17,7 +17,7 @@ module.exports = class Model {
 				let schemaName = schemaFile.replace('.js', '')
 				schemaName = schemaName.charAt(0).toUpperCase() + schemaName.slice(1)
 				this[schemaName] = mongoose.model(schemaName, schema)
-				console.info(`🌎 Model ${schemaName} loaded`)
+				console.info(`🌎 Model loaded ${schemaFile}`)
 			}
 		})
 		console.info(`🌎 Model init done`)

@@ -34,7 +34,7 @@ module.exports = class Controller {
         const service = require(path.resolve(`${controllerDir}/${serviceFile}`))
         this.typeDefs.push(service.typeDefs)
         this.resolvers.push(service.resolvers)
-        console.info(`🕹 Controller service loadded ${service}`)
+        console.info(`🕹 Controller loaded ${serviceFile}`)
       }
     })
     console.info(`🕹 Controller init done`)

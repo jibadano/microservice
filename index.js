@@ -34,7 +34,7 @@ module.exports = class Microservice {
     server.applyMiddleware({ app, path: this.config.get('graphql.path') })
 
     app.listen(port, host, () => {
-      console.info(`🚀  Server ready at ${host}:${port} `)
+      console.log(`🚀  Server ready at ${host}:${port} `)
     })
   }
 
