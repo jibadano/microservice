@@ -2,12 +2,17 @@ const mongoose = require('mongoose')
 const get = require('lodash/get')
 const merge = require('lodash/merge')
 
+const environments = ["development", "staging", "production"]
+
+if (process.env.NODE_ENV && !environments.includes(process.env.NODE_ENV))
+	console.warn(`⚙️Config ${proces.env.NODE_ENV} environment not available`)
+
 const env = process.env.NODE_ENV || 'development'
+
 const path = require('path')
 const package = require(path.resolve('package.json'))
 const packageName = get(package, 'name')
 
-const environments = ["development", "staging", "production"]
 
 module.exports = class Config {
 	constructor(config, moduleName = packageName) {
@@ -34,12 +39,12 @@ module.exports = class Config {
 
 	async refresh() {
 		if (!this.remote && this.remoteUrl) {
-			mongoose.connect(this.remoteUrl, { useNewUrlParser: true })
+			mongoose.connect(this.remoteUrl, { useNewUrlParser: true }).then(() => console.info(`⚙️Config connected successfully`)).catch(console.error)
 			this.remote = mongoose.model('Config', new mongoose.Schema({ development: Object, staging: Object, production: Object }))
 		}
 
 		if (this.remote) {
-			const conf = await this.remote.findOne().exec().catch(console.log)
+			const conf = await this.remote.findOne().exec().catch(console.error)
 			this.setConfig(conf)
 		}
 
@@ -47,6 +52,7 @@ module.exports = class Config {
 	}
 
 	async init() {
+		console.inf(`⚙️Config init for ${this.moduleName} ${this.remoteUrl}`)
 		await this.refresh()
 	}
 
@@ -64,7 +70,10 @@ module.exports = class Config {
 					}
 			}
 		}
+
 		values.lastModified = new Date()
+		console.info(`⚙️Config new config loaded ${values.lastModified}`)
+
 		this.values = values
 	}
 }

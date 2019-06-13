@@ -17,8 +17,8 @@ module.exports = class Microservice {
     this.model = new Model(this.config)
     this.controller = new Controller(this.config)
 
-    const host = this.config.get('host')
-    const port = this.config.get('port')
+    const host = this.config.get('host') || '0.0.0.0'
+    const port = process.env.PORT || this.config.get('port') || 80
     const app = express()
 
     app.use(bodyParser.json())
@@ -33,7 +33,7 @@ module.exports = class Microservice {
     })
     server.applyMiddleware({ app, path: this.config.get('graphql.path') })
 
-    app.listen(process.env.PORT || port || 80, host, () => {
+    app.listen(port, host, () => {
       console.log(`🚀  Server ready at ${host}:${port} `)
     })
   }
