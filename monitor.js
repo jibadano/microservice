@@ -5,12 +5,14 @@ const LogSchema = new mongoose.Schema({
   trace: { type: String, ref: "Trace" },
   timestamp: { type: Date, default: Date.now },
   message: String,
+  data: String,
   type: String
 });
 
 const TraceSchema = new mongoose.Schema({
   _id: String,
   user: String,
+  operation: String,
   ip: String,
   module: String,
   date: { type: Date, default: Date.now },
@@ -35,23 +37,35 @@ module.exports = class Monitor {
     console.info(`📝 Monitor init done`);
   }
 
-  log(message, trace, type = "info") {
-    const log = { trace, message, type };
-    this.Log ? new this.Log(log).save() : console[type](log);
+  log(message, trace, data, type = "info") {
+    const log = { trace, message, type, data };
+    this.Log
+      ? new this.Log(log).save()
+      : console[type](">", new Date(), trace, message, data);
   }
 
-  trace(user, ip, date = new Date()) {
-    const _id = uuidv1();
+  trace(operation, user, ip, date = new Date()) {
     const trace = {
-      _id,
+      _id: uuidv1(),
+      operation,
       user,
       ip,
       date,
       environment: process.env.NODE_ENV,
       module: this.module
     };
-
-    this.Trace ? new this.Trace(trace).save() : console.log(trace);
+    this.Trace
+      ? new this.Trace(trace).save()
+      : console.log(
+          ">",
+          date,
+          trace._id,
+          trace.operation,
+          trace.user,
+          trace.ip,
+          trace.module,
+          trace.environment
+        );
 
     return trace;
   }

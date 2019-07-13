@@ -24,12 +24,6 @@ module.exports = class Microservice {
     const accessControl = this.config.get("accessControl") || {};
     const app = express();
 
-    // get tracking data
-    app.use((req, res, next) => {
-      req.requesterIp = req.date = new Date();
-      next();
-    });
-
     // Access control
     app.use((req, res, next) => {
       const ip = req.connection.localAddress;
@@ -47,20 +41,24 @@ module.exports = class Microservice {
     const jwtOptions = this.config.get("jwt.options");
     if (jwtOptions) app.use(jwt(jwtOptions));
 
-    // Configure tracking and log request
+    // Tracing
     app.use((req, res, next) => {
       const trace = this.monitor.trace(
-        req.user && req.user._id,
+        req.body.operationName,
+        req.user && req.user.user && req.user.user._id,
         req.headers["x-forwarded-for"] || req.connection.remoteAddress
       );
 
       req.trace = trace;
+      req.log = (message, body, type) => {
+        this.monitor.log(message, trace._id, body, type);
+      };
       next();
     });
 
     app.use((req, res, next) => {
+      req.log("request", req.body.query);
       next();
-      this.monitor.log(JSON.stringify(req.body), req.trace._id);
     });
 
     const server = new ApolloServer(this.controller);
@@ -68,14 +66,15 @@ module.exports = class Microservice {
       schema: server.schema,
       context: {
         session: req.user,
-        trace: req.trace
+        trace: req.trace,
+        log: req.log
       },
       formatError: res => {
-        this.monitor.log(JSON.stringify(res.body), req.trace._id, "error");
+        req.log("response", JSON.stringify(res.data), "error");
         return res;
       },
       formatResponse: res => {
-        this.monitor.log(JSON.stringify(res.body), req.trace._id);
+        req.log("response", JSON.stringify(res.data));
         return res;
       }
     });
