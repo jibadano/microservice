@@ -32,7 +32,7 @@ module.exports = class Microservice {
 
     // Access control
     app.use((req, res, next) => {
-      const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+      const ip = req.connection.localAddress;
       next(
         accessControl && accessControl.ip && ip != accessControl.ip
           ? "Access Denied"
