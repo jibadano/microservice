@@ -27,6 +27,8 @@ module.exports = class Microservice {
     // Access control
     app.use((req, res, next) => {
       const ip = req.connection.localAddress;
+      console.log("REQUEST IP", ip);
+
       next(
         accessControl && accessControl.ip && ip != accessControl.ip
           ? "Access Denied"
