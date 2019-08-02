@@ -12,6 +12,7 @@ const Monitor = require('./monitor')
 module.exports = class Microservice {
   constructor(config) {
     this.config = new Config(config)
+    this.sign = () => {}
   }
 
   async init() {
@@ -44,13 +45,10 @@ module.exports = class Microservice {
 
     // Session
     const jwtOptions = this.config.get('jwt.options')
+    const jwtSignOptions = this.config.get('jwt.signOptions')
     if (jwtOptions) {
       this.sign = data =>
-        jsonwebtoken.sign(
-          data,
-          jwtOptions.secret,
-          config.get('jwt.signOptions')
-        )
+        jsonwebtoken.sign(data, jwtOptions.secret, jwtSignOptions)
 
       app.use(jwt(jwtOptions))
     }
