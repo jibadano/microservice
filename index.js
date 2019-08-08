@@ -95,5 +95,6 @@ module.exports = class Microservice {
     app.listen(port, host, () => {
       console.log(`🚀  Server ready at ${host}:${port} `)
     })
+    return this.server
   }
 }
