@@ -14,7 +14,8 @@ module.exports = class Controller {
         type Mutation {
           refreshConfig: Boolean
         }
-      `]
+      `
+    ]
 
     this.resolvers = [
       {
@@ -23,11 +24,11 @@ module.exports = class Controller {
         },
         Mutation: {
           refreshConfig: () => config.refresh()
-        },
+        }
       }
     ]
 
-    const controllerDir = config.get('services.path')
+    const controllerDir = process.env.PWD + '/' + config.get('services.path')
     console.info(`🕹 Controller reading from ${controllerDir}`)
     fs.readdirSync(controllerDir).forEach(serviceFile => {
       if (serviceFile !== 'index.js') {
@@ -38,7 +39,5 @@ module.exports = class Controller {
       }
     })
     console.info(`🕹 Controller init done`)
-
   }
-
 }
