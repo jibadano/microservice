@@ -73,9 +73,9 @@ module.exports = class Microservice {
       next()
     })
 
-    const server = new ApolloServer(this.controller)
-    server.createGraphQLServerOptions = req => ({
-      schema: server.schema,
+    this.server = new ApolloServer(this.controller)
+    this.server.createGraphQLServerOptions = req => ({
+      schema: this.server.schema,
       context: {
         session: req.user,
         trace: req.trace,
@@ -90,7 +90,7 @@ module.exports = class Microservice {
         return res
       }
     })
-    server.applyMiddleware({ app, path: this.config.get('graphql.path') })
+    this.server.applyMiddleware({ app, path: this.config.get('graphql.path') })
 
     app.listen(port, host, () => {
       console.log(`🚀  Server ready at ${host}:${port} `)
