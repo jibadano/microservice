@@ -5,6 +5,7 @@ const path = require('path')
 module.exports = class Controller {
   constructor(config) {
     console.info(`🕹 Controller init`)
+    const path = config.get('services.path') || 'src/services'
     this.typeDefs = [
       gql`
         type Query {
@@ -28,7 +29,7 @@ module.exports = class Controller {
       }
     ]
 
-    const controllerDir = process.env.PWD + '/' + config.get('services.path')
+    const controllerDir = process.env.PWD + '/' + path
     console.info(`🕹 Controller reading from ${controllerDir}`)
     fs.readdirSync(controllerDir).forEach(serviceFile => {
       if (serviceFile !== 'index.js') {

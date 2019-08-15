@@ -5,12 +5,13 @@ const path = require('path')
 module.exports = class Model {
   constructor(config) {
     console.info(`🌎 Model init`)
+    const path = config.get('model.path') || 'src/model'
     mongoose
       .connect(config.get('mongo'), { useNewUrlParser: true })
       .then(() => console.info(`🌎 Model db connected`))
       .catch(console.error)
 
-    const modelDir = process.env.PWD + '/' + config.get('model.path')
+    const modelDir = process.env.PWD + '/' + path
     console.info(`🌎 Model reading from ${modelDir}`)
     fs.readdirSync(modelDir).forEach(schemaFile => {
       if (schemaFile !== 'index.js') {
