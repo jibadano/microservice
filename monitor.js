@@ -57,8 +57,6 @@ module.exports = class Monitor {
   }
 
   trace(operation, user, ip, date = new Date()) {
-    if (this.mode === 'off') return
-
     const trace = {
       _id: uuidv1(),
       operation,
@@ -68,18 +66,20 @@ module.exports = class Monitor {
       environment: process.env.NODE_ENV,
       module: this.module
     }
-    this.Trace
-      ? new this.Trace(trace).save()
-      : console.log(
-          '>',
-          date,
-          trace._id,
-          trace.operation,
-          trace.user,
-          trace.ip,
-          trace.module,
-          trace.environment
-        )
+
+    if (this.mode !== 'off')
+      this.Trace
+        ? new this.Trace(trace).save()
+        : console.log(
+            '>',
+            date,
+            trace._id,
+            trace.operation,
+            trace.user,
+            trace.ip,
+            trace.module,
+            trace.environment
+          )
 
     return trace
   }
