@@ -10,9 +10,10 @@ const Controller = require('./controller')
 const Monitor = require('./monitor')
 
 module.exports = class Microservice {
-  constructor(config) {
+  constructor(config, meta) {
     this.config = new Config(config)
     this.sign = () => {}
+    this.meta = meta ? meta : () => {}
   }
 
   async init() {
@@ -31,7 +32,6 @@ module.exports = class Microservice {
     // Access control
     app.use((req, res, next) => {
       const ip = req.connection.localAddress
-      console.log('REQUEST IP', ip)
 
       next(
         accessControl && accessControl.ip && ip != accessControl.ip
@@ -79,7 +79,8 @@ module.exports = class Microservice {
       context: {
         session: req.user,
         trace: req.trace,
-        log: req.log
+        log: req.log,
+        meta: this.meta(req)
       },
       formatError: res => {
         req.log('response', JSON.stringify(res.data), 'error')
