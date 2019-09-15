@@ -10,10 +10,11 @@ const Controller = require('./controller')
 const Monitor = require('./monitor')
 
 module.exports = class Microservice {
-  constructor(config, meta) {
+  constructor(config, meta, routes) {
     this.config = new Config(config)
     this.sign = () => {}
     this.meta = meta ? meta : () => {}
+    this.routes = routes || []
   }
 
   async init() {
@@ -27,6 +28,7 @@ module.exports = class Microservice {
     const host = this.config.get('host') || '0.0.0.0'
     const port = process.env.PORT || this.config.get('port') || 80
     const accessControl = this.config.get('accessControl') || {}
+    const graphqlPath = this.config.get('graphql.path') || '/graphql'
     const app = express()
 
     // Access control
@@ -73,6 +75,12 @@ module.exports = class Microservice {
       next()
     })
 
+    this.routes.forEach(({ method, path, handler }) => {
+      if (!['get', 'post', 'put', 'delete', 'all'].includes(method)) return
+      if (path == graphqlPath) return
+      app[method](path, handler)
+    })
+
     this.server = new ApolloServer(this.controller)
     this.server.createGraphQLServerOptions = req => ({
       schema: this.server.schema,
@@ -93,7 +101,7 @@ module.exports = class Microservice {
     })
     this.server.applyMiddleware({
       app,
-      path: this.config.get('graphql.path') || '/graphql'
+      path: graphqlPath
     })
 
     app.listen(port, host, () => {
