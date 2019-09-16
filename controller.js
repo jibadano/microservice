@@ -29,16 +29,41 @@ module.exports = class Controller {
       }
     ]
 
+    this.routes = []
+
     const controllerDir = process.env.PWD + '/' + servicesPath
     console.info(`🕹 Controller reading from ${controllerDir}`)
     fs.readdirSync(controllerDir).forEach(serviceFile => {
       if (serviceFile !== 'index.js') {
         const service = require(path.resolve(`${controllerDir}/${serviceFile}`))
-        this.typeDefs.push(service.typeDefs)
-        this.resolvers.push(service.resolvers)
+        const serviceName = serviceFile.replace('.js', '')
+        if (service.typeDefs && service.resolvers) {
+          this.typeDefs.push(service.typeDefs)
+          this.resolvers.push(service.resolvers)
+        }
+
+        if (typeof service === 'function')
+          this.routes.push({
+            method: 'all',
+            path: `/${serviceName}`,
+            handler: service
+          })
+        else {
+          const methods = Object.keys(service)
+          methods.forEach(method => {
+            if (['get', 'post', 'put', 'delete', 'all'].includes(method))
+              this.routes.push({
+                method,
+                path: `/${serviceName}`,
+                handler: service[method]
+              })
+          })
+        }
+
         console.info(`🕹 Controller loaded ${serviceFile}`)
       }
     })
+
     console.info(`🕹 Controller init done`)
   }
 }

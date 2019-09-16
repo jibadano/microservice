@@ -8,13 +8,12 @@ const Config = require('./config')
 const Model = require('./model')
 const Controller = require('./controller')
 const Monitor = require('./monitor')
+const Context = require('./context')
 
 module.exports = class Microservice {
-  constructor(config, meta, routes) {
+  constructor(config) {
     this.config = new Config(config)
     this.sign = () => {}
-    this.meta = meta ? meta : () => {}
-    this.routes = routes || []
   }
 
   async init() {
@@ -23,6 +22,7 @@ module.exports = class Microservice {
     this.monitor = new Monitor(this.config)
     this.model = new Model(this.config)
     this.controller = new Controller(this.config)
+    this.context = new Context(this.config)
     this.sign = () => {}
 
     const host = this.config.get('host') || '0.0.0.0'
@@ -75,30 +75,38 @@ module.exports = class Microservice {
       next()
     })
 
-    this.routes.forEach(({ method, path, handler }) => {
+    this.controller.routes.forEach(({ method, path, handler }) => {
       if (!['get', 'post', 'put', 'delete', 'all'].includes(method)) return
       if (path == graphqlPath) return
       app[method](path, handler)
     })
 
     this.server = new ApolloServer(this.controller)
-    this.server.createGraphQLServerOptions = req => ({
-      schema: this.server.schema,
-      context: {
-        session: req.user,
-        trace: req.trace,
-        log: req.log,
-        meta: this.meta(req)
-      },
-      formatError: res => {
-        req.log('response', JSON.stringify(res.data), 'error')
-        return res
-      },
-      formatResponse: res => {
-        req.log('response', JSON.stringify(res.data))
-        return res
+    this.server.createGraphQLServerOptions = (req, res) => {
+      const context = {}
+      this.context.handlers.forEach(contextItem => {
+        context[contextItem.name] = contextItem.handler(req, res)
+      })
+
+      return {
+        schema: this.server.schema,
+        context: {
+          session: req.user,
+          trace: req.trace,
+          log: req.log,
+          ...context
+        },
+        formatError: res => {
+          req.log('response', JSON.stringify(res.data), 'error')
+          return res
+        },
+        formatResponse: res => {
+          req.log('response', JSON.stringify(res.data))
+          return res
+        }
       }
-    })
+    }
+
     this.server.applyMiddleware({
       app,
       path: graphqlPath
