@@ -117,4 +117,8 @@ module.exports = class Microservice {
     })
     return this.server
   }
+
+  getModel(modelName) {
+    return modelName ? this.model : this.model[modelName]
+  }
 }
