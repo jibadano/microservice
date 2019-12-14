@@ -10,21 +10,25 @@ module.exports = class context {
 
     const contextDir = process.env.PWD + '/' + contextPath
     console.info(`🕹 context reading from ${contextDir}`)
-    fs.readdirSync(contextDir).forEach(contextFile => {
-      const contextName = contextFile.replace('.js', '')
+    try {
+      fs.readdirSync(contextDir).forEach(contextFile => {
+        const contextName = contextFile.replace('.js', '')
 
-      if (contextFile !== 'index.js') {
-        const context = require(path.resolve(`${contextDir}/${contextFile}`))
+        if (contextFile !== 'index.js') {
+          const context = require(path.resolve(`${contextDir}/${contextFile}`))
 
-        if (typeof context === 'function')
-          this.handlers.push({
-            name: contextName,
-            handler: context
-          })
+          if (typeof context === 'function')
+            this.handlers.push({
+              name: contextName,
+              handler: context
+            })
 
-        console.info(`🕹 context loaded ${contextFile}`)
-      }
-    })
+          console.info(`🕹 context loaded ${contextFile}`)
+        }
+      })
+    } catch (e) {
+      console.info(`🕹 context not loaded ${e}`)
+    }
 
     console.info(`🕹 context init done`)
   }
