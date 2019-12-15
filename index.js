@@ -53,6 +53,11 @@ module.exports = class Microservice {
         jsonwebtoken.sign(data, jwtOptions.secret, jwtSignOptions)
 
       app.use(jwt(jwtOptions))
+      if (this.config.get('jwt.required')) {
+        app.use((req, res, next) => {
+          req.user ? res.status(403).end() : next()
+        })
+      }
     }
 
     // Tracing
