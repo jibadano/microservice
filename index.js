@@ -9,6 +9,7 @@ const Model = require('./model')
 const Controller = require('./controller')
 const Monitor = require('./monitor')
 const Context = require('./context')
+const Middleware = require('./middleware')
 
 module.exports = class Microservice {
   constructor(config) {
@@ -23,6 +24,8 @@ module.exports = class Microservice {
     this.model = new Model(this.config)
     this.controller = new Controller(this.config)
     this.context = new Context(this.config)
+    this.middleware = new Middleware(this.config)
+
     this.sign = () => {}
 
     const host = this.config.get('host') || '0.0.0.0'
@@ -44,6 +47,9 @@ module.exports = class Microservice {
 
     // Body parser
     app.use(bodyParser.json())
+
+    //Set middlewares
+    this.middleware.list.forEach(app.use)
 
     // Session
     const jwtOptions = this.config.get('jwt.options')
