@@ -49,7 +49,7 @@ module.exports = class Microservice {
     app.use(bodyParser.json())
 
     //Set middlewares
-    this.middleware.list.forEach(app.use)
+    this.middleware.list.forEach(mw => app.use(mw))
 
     // Session
     const jwtOptions = this.config.get('jwt.options')

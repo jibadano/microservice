@@ -17,7 +17,8 @@ module.exports = class Middleware {
             `${middlewareDir}/${middlewareFile}`
           ))
 
-          if (middleware instanceof Array) this.list.concat(middleware)
+          if (middleware instanceof Array)
+            this.list = this.list.concat(middleware)
           else if (!middleware) this.list.push(middleware)
 
           console.info(`🕹 middleware loaded ${middlewareFile}`)
