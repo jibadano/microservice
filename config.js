@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const get = require('lodash/get')
-const merge = require('lodash/merge')
+const merge = require('lodash/mergeWith')
 
 const environments = ['development', 'staging', 'production']
 
@@ -69,6 +69,10 @@ module.exports = class Config {
 
   setConfig(values) {
     if (!values) return null
+    const mergePolicy = (objValue, srcValue) =>
+      typeof objValue == 'object'
+        ? merge(objValue, srcValue, mergePolicy)
+        : objValue
 
     for (let env of environments) {
       if (values[env]) {
@@ -77,7 +81,7 @@ module.exports = class Config {
           for (let mod in values[env]) {
             if (mod != 'default') {
               const modConfig = values[env][mod]
-              values[env][mod] = merge(modConfig, def)
+              values[env][mod] = merge(modConfig, def, mergePolicy)
             }
           }
       }
