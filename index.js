@@ -59,9 +59,6 @@ module.exports = class Microservice {
         jsonwebtoken.sign(data, jwtOptions.secret, jwtSignOptions)
 
       app.use(jwt(jwtOptions))
-
-      if (this.config.get('jwt.required'))
-        app.use((req, res, next) => next(!req.user ? 'Session required' : null))
     }
 
     // Tracing
@@ -96,6 +93,9 @@ module.exports = class Microservice {
       this.context.handlers.forEach(contextItem => {
         context[contextItem.name] = contextItem.handler(req, res)
       })
+
+      if (this.config.get('jwt.required'))
+        !req.user && res.status('403').end('Session required')
 
       return {
         schema: this.server.schema,
