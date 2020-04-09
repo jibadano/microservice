@@ -26,7 +26,7 @@ module.exports = class Mail {
 
         let subject =
           templateName[0].toUpperCase() +
-          templateName.slice(1).replace('_', ' ')
+          templateName.slice(1).replace(/_/g, ' ')
 
         for (let d in data) {
           subject = subject.replace(new RegExp(`{{${d}}}`, 'g'), data[d])
