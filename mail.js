@@ -34,7 +34,7 @@ module.exports = class Mail {
         }
 
         this.transport.sendMail({
-          from: this.from,
+          from: { name: this.from, address: config.get('mail.user') },
           to,
           subject,
           html: template
