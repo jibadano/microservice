@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const nodemailer = require('nodemailer')
-module.exports = class mail {
+module.exports = class Mail {
   constructor(config) {
     console.info(`📧 mail init`)
 
@@ -33,7 +33,7 @@ module.exports = class mail {
           template = template.replace(new RegExp(`{{${d}}}`, 'g'), data[d])
         }
 
-        this.transporter.sendMail({
+        this.transport.sendMail({
           from: this.from,
           to,
           subject,
@@ -51,8 +51,8 @@ module.exports = class mail {
             const template = fs.readFileSync(
               path.resolve(`${mailDir}/${mailFile}`)
             )
-            const templateName = serviceFile.replace('.html', '')
-            this.templates[templateName] = template
+            const templateName = mailFile.replace('.html', '')
+            this.templates[templateName] = template.toString()
 
             console.info(`📧 mail loaded ${mailFile}`)
           }
