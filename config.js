@@ -30,8 +30,6 @@ module.exports = class Config {
     const key = env + (param ? `.${this.moduleName}.${param}` : '')
     const value = get(this.values, key)
 
-    if (!value) console.log(`⚙️ Config value ${key} not found`)
-
     return value
   }
 
@@ -52,10 +50,7 @@ module.exports = class Config {
     }
 
     if (this.remote) {
-      const conf = await this.remote
-        .findOne()
-        .exec()
-        .catch(console.error)
+      const conf = await this.remote.findOne().exec().catch(console.error)
       this.setConfig(conf)
     }
 

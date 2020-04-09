@@ -10,6 +10,7 @@ const Controller = require('./controller')
 const Monitor = require('./monitor')
 const Context = require('./context')
 const Middleware = require('./middleware')
+const Mail = require('./mail')
 
 module.exports = class Microservice {
   constructor(config) {
@@ -25,6 +26,7 @@ module.exports = class Microservice {
     this.controller = new Controller(this.config)
     this.context = new Context(this.config)
     this.middleware = new Middleware(this.config)
+    this.mail = new Mail(this.config)
 
     this.sign = () => {}
 
@@ -49,13 +51,13 @@ module.exports = class Microservice {
     app.use(bodyParser.json())
 
     //Set middlewares
-    this.middleware.list.forEach(mw => app.use(mw))
+    this.middleware.list.forEach((mw) => app.use(mw))
 
     // Session
     const jwtOptions = this.config.get('jwt.options')
     const jwtSignOptions = this.config.get('jwt.signOptions')
     if (jwtOptions) {
-      this.sign = data =>
+      this.sign = (data) =>
         jsonwebtoken.sign(data, jwtOptions.secret, jwtSignOptions)
 
       app.use(jwt(jwtOptions))
@@ -90,7 +92,7 @@ module.exports = class Microservice {
     this.server = new ApolloServer(this.controller)
     this.server.createGraphQLServerOptions = (req, res) => {
       const context = {}
-      this.context.handlers.forEach(contextItem => {
+      this.context.handlers.forEach((contextItem) => {
         context[contextItem.name] = contextItem.handler(req, res)
       })
 
@@ -105,11 +107,11 @@ module.exports = class Microservice {
           log: req.log,
           ...context
         },
-        formatError: res => {
+        formatError: (res) => {
           req.log('response', JSON.stringify(res.data), 'error')
           return res
         },
-        formatResponse: res => {
+        formatResponse: (res) => {
           req.log('response', JSON.stringify(res.data))
           return res
         }
