@@ -22,6 +22,8 @@ module.exports = class Controller {
     const servicesPath = config.get('services.path') || 'src/services'
     this.typeDefs = [
       gql`
+        directive @auth on FIELD_DEFINITION
+
         type Query {
           version: String
         }
