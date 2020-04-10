@@ -97,9 +97,6 @@ module.exports = class Microservice {
         context[contextItem.name] = contextItem.handler(req, res)
       })
 
-      if (this.config.get('jwt.required'))
-        !req.user && res.status('403').end('Session required')
-
       return {
         schema: this.server.schema,
         context: {
