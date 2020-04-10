@@ -1,6 +1,20 @@
 const fs = require('fs')
-const { gql } = require('apollo-server')
+const { gql, AuthenticationError } = require('apollo-server')
 const path = require('path')
+const { SchemaDirectiveVisitor } = require('apollo-server-express')
+
+class AuthDirective extends SchemaDirectiveVisitor {
+  visitFieldDefinition(field) {
+    const { resolve } = field
+
+    field.resolve = (...args) => {
+      const [, , context] = args
+      if (!context.session || !context.session.user)
+        throw new AuthenticationError('Session required')
+      else return resolve.apply(this, args)
+    }
+  }
+}
 
 module.exports = class Controller {
   constructor(config) {
@@ -30,10 +44,13 @@ module.exports = class Controller {
     ]
 
     this.routes = []
+    this.schemaDirectives = {
+      auth: AuthDirective
+    }
 
     const controllerDir = process.env.PWD + '/' + servicesPath
     console.info(`🕹 Controller reading from ${controllerDir}`)
-    fs.readdirSync(controllerDir).forEach(serviceFile => {
+    fs.readdirSync(controllerDir).forEach((serviceFile) => {
       if (serviceFile !== 'index.js') {
         const service = require(path.resolve(`${controllerDir}/${serviceFile}`))
         const serviceName = serviceFile.replace('.js', '')
@@ -50,7 +67,7 @@ module.exports = class Controller {
           })
         else {
           const methods = Object.keys(service)
-          methods.forEach(method => {
+          methods.forEach((method) => {
             if (['get', 'post', 'put', 'delete', 'all'].includes(method))
               this.routes.push({
                 method,

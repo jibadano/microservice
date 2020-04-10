@@ -2,7 +2,6 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const jwt = require('express-jwt')
 const jsonwebtoken = require('jsonwebtoken')
-
 const { ApolloServer } = require('apollo-server-express')
 const Config = require('./config')
 const Model = require('./model')
@@ -60,7 +59,9 @@ module.exports = class Microservice {
       this.sign = (data) =>
         jsonwebtoken.sign(data, jwtOptions.secret, jwtSignOptions)
 
-      app.use(jwt(jwtOptions))
+      app.use((req, res, next) => {
+        jwt(jwtOptions)(req, res, () => next())
+      })
     }
 
     // Tracing
