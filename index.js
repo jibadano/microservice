@@ -27,8 +27,6 @@ module.exports = class Microservice {
     this.middleware = new Middleware(this.config)
     this.mail = new Mail(this.config)
 
-    this.sign = () => {}
-
     const host = this.config.get('host') || '0.0.0.0'
     const port = process.env.PORT || this.config.get('port') || 80
     const accessControl = this.config.get('accessControl') || {}
@@ -56,8 +54,12 @@ module.exports = class Microservice {
     const jwtOptions = this.config.get('jwt.options')
     const jwtSignOptions = this.config.get('jwt.signOptions')
     if (jwtOptions) {
-      this.sign = (data) =>
-        jsonwebtoken.sign(data, jwtOptions.secret, jwtSignOptions)
+      this.sign = (data, signOptions) =>
+        jsonwebtoken.sign(
+          data,
+          jwtOptions.secret,
+          signOptions || jwtSignOptions
+        )
 
       app.use((req, res, next) => {
         jwt(jwtOptions)(req, res, () => next())
