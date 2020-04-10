@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const get = require('lodash/get')
+const jwt = require('express-jwt')
 const jsonwebtoken = require('jsonwebtoken')
 
 const { ApolloServer } = require('apollo-server-express')
@@ -60,21 +60,7 @@ module.exports = class Microservice {
       this.sign = (data) =>
         jsonwebtoken.sign(data, jwtOptions.secret, jwtSignOptions)
 
-      app.use((req, res, next) => {
-        const auth = get(req, 'headers.authorization')
-        if (auth) {
-          try {
-            req.user = jsonwebtoken.verify(
-              auth.replace('Bearer ', ''),
-              jwtOptions.secret,
-              jwtSignOptions
-            )
-          } catch (e) {
-            //session expired
-          }
-        }
-        next()
-      })
+      app.use(jwt(jwtOptions))
     }
 
     // Tracing

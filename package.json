@@ -1,6 +1,6 @@
 {
   "name": "@jibadano/microservice",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "main": "src/index.js",
   "scripts": {},
   "keywords": [],
@@ -11,6 +11,7 @@
     "apollo-server-express": "^2.0.0-rc.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
+    "express-jwt": "^5.3.3",
     "graphql": "^0.13.2",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
