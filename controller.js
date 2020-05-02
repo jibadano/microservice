@@ -3,6 +3,14 @@ const { gql, AuthenticationError } = require('apollo-server')
 const path = require('path')
 const { SchemaDirectiveVisitor } = require('apollo-server-express')
 
+const Roles = {
+  GUEST: 0,
+  USER: 1,
+  ADMIN: 2
+}
+
+const isAuthorized = (role, requiredRole) => Roles[requiredRole] <= Roles[role]
+
 class AuthDirective extends SchemaDirectiveVisitor {
   visitObject(type) {
     this.ensureFieldsWrapped(type)
@@ -40,7 +48,7 @@ class AuthDirective extends SchemaDirectiveVisitor {
         if (
           !context.session ||
           !context.session.user ||
-          ![requiredRole, 'ADMIN'].includes(context.session.user.role)
+          !isAuthorized(context.session.user.role, requiredRole)
         )
           throw new AuthenticationError('Session required')
 
