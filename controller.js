@@ -2,6 +2,7 @@ const fs = require('fs')
 const { gql, AuthenticationError } = require('apollo-server')
 const path = require('path')
 const { SchemaDirectiveVisitor } = require('apollo-server-express')
+const { defaultFieldResolver } = require('graphql')
 
 const Roles = {
   GUEST: 0,
