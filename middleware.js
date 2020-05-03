@@ -25,6 +25,7 @@ module.exports = class Middleware {
       })
     } catch (e) {}
 
-    this.list.length && console.info(`🔗Middleware  READY ${middlewares}`)
+    this.list.length &&
+      console.info(`🔗Middleware  READY ${middlewares.map((m) => `\n\t${m}`)}`)
   }
 }

@@ -83,8 +83,8 @@ module.exports = class Config {
       }
     }
 
-    values.lastModified = new Date()
-    values.version = packageVersion
+    values[env][this.moduleName].lastModified = new Date().toISOString()
+    values[env][this.moduleName].version = packageVersion
     console.info(
       `🎛 Config READY ${this.moduleName} ${env} ${new Date().toISOString()}`
     )
