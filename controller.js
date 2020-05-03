@@ -4,13 +4,15 @@ const path = require('path')
 const { SchemaDirectiveVisitor } = require('apollo-server-express')
 const { defaultFieldResolver } = require('graphql')
 
-const Roles = {
+const ROLES = {
   GUEST: 0,
   USER: 1,
   ADMIN: 2
 }
 
-const isAuthorized = (role, requiredRole) => Roles[requiredRole] <= Roles[role]
+const DEFAULT_PATH = 'src/services'
+
+const isAuthorized = (role, requiredRole) => ROLES[requiredRole] <= ROLES[role]
 
 class AuthDirective extends SchemaDirectiveVisitor {
   visitObject(type) {
@@ -61,8 +63,7 @@ class AuthDirective extends SchemaDirectiveVisitor {
 
 module.exports = class Controller {
   constructor(config) {
-    console.info(`🕹 Controller init`)
-    const servicesPath = config.get('services.path') || 'src/services'
+    const servicesPath = config.get('services.path') || DEFAULT_PATH
     this.typeDefs = [
       gql`
         directive @auth(requires: Role = USER) on OBJECT | FIELD_DEFINITION
@@ -100,7 +101,7 @@ module.exports = class Controller {
     }
 
     const controllerDir = process.env.PWD + '/' + servicesPath
-    console.info(`🕹 Controller reading from ${controllerDir}`)
+    const graphqlServices = []
     fs.readdirSync(controllerDir).forEach((serviceFile) => {
       if (serviceFile !== 'index.js') {
         const service = require(path.resolve(`${controllerDir}/${serviceFile}`))
@@ -108,9 +109,8 @@ module.exports = class Controller {
         if (service.typeDefs && service.resolvers) {
           this.typeDefs.push(service.typeDefs)
           this.resolvers.push(service.resolvers)
-        }
-
-        if (typeof service === 'function')
+          graphqlServices.push(serviceName)
+        } else if (typeof service === 'function')
           this.routes.push({
             method: 'all',
             path: `/${serviceName}`,
@@ -127,11 +127,13 @@ module.exports = class Controller {
               })
           })
         }
-
-        console.info(`🕹 Controller loaded ${serviceFile}`)
       }
     })
 
-    console.info(`🕹 Controller init done`)
+    console.info(
+      `🕹 Controller READY  ${this.routes.map(
+        (r) => `\n${r.path}  ${r.method}`
+      )} ${graphqlServices.map((s) => `\n${s}  graphql`)}`
+    )
   }
 }

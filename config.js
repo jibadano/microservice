@@ -5,7 +5,7 @@ const merge = require('lodash/mergeWith')
 const environments = ['development', 'staging', 'production']
 
 if (process.env.NODE_ENV && !environments.includes(process.env.NODE_ENV))
-  console.warn(`⚙️ Config ${process.env.NODE_ENV} environment not available`)
+  console.warn(`🎛 Config ${process.env.NODE_ENV} environment not available`)
 
 const env = process.env.NODE_ENV || 'development'
 
@@ -37,8 +37,7 @@ module.exports = class Config {
     if (!this.remote && this.remoteUrl) {
       mongoose
         .connect(this.remoteUrl, { useNewUrlParser: true })
-        .then(() => console.info(`⚙️ Config connected successfully`))
-        .catch(console.error)
+        .catch((e) => console.error)
       this.remote = mongoose.model(
         'Config',
         new mongoose.Schema({
@@ -58,7 +57,6 @@ module.exports = class Config {
   }
 
   async init() {
-    console.info(`⚙️ Config init for ${this.moduleName} ${this.remoteUrl}`)
     await this.refresh()
   }
 
@@ -84,7 +82,9 @@ module.exports = class Config {
 
     values.lastModified = new Date()
     values.version = packageVersion
-    console.info(`⚙️ Config new config loaded ${values.lastModified}`)
+    console.info(
+      `🎛 Config READY ${this.moduleName} ${env} ${values.lastModified}`
+    )
 
     this.values = values
   }

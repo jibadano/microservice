@@ -1,17 +1,15 @@
 const fs = require('fs')
 const path = require('path')
-
-module.exports = class context {
+const DEFAULT_PATH = 'src/context'
+module.exports = class Context {
   constructor(config) {
-    console.info(`🕹 context init`)
-    const contextPath = config.get('context.path') || 'src/context'
+    const contextPath = config.get('context.path') || DEFAULT_PATH
 
     this.handlers = []
 
     const contextDir = process.env.PWD + '/' + contextPath
-    console.info(`🕹 context reading from ${contextDir}`)
     try {
-      fs.readdirSync(contextDir).forEach(contextFile => {
+      fs.readdirSync(contextDir).forEach((contextFile) => {
         const contextName = contextFile.replace('.js', '')
 
         if (contextFile !== 'index.js') {
@@ -22,14 +20,13 @@ module.exports = class context {
               name: contextName,
               handler: context
             })
-
-          console.info(`🕹 context loaded ${contextFile}`)
         }
       })
     } catch (e) {
-      console.info(`🕹 context not loaded ${e}`)
+      console.error(`📰 Context ERROR ${e}`)
     }
 
-    console.info(`🕹 context init done`)
+    this.handlers.length &&
+      console.info(`📰 Context  READY ${this.handlers.map((h) => h.name)}`)
   }
 }

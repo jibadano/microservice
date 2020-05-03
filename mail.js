@@ -1,12 +1,11 @@
 const fs = require('fs')
 const path = require('path')
 const nodemailer = require('nodemailer')
+
+const DEFAULT_PATH = 'src/mail'
 module.exports = class Mail {
   constructor(config) {
-    console.info(`📧 mail init`)
-
     if (config.get('mail')) {
-      const mailPath = config.get('mail.path') || 'src/mail'
       this.from = config.get('mail.from') || config.get('name')
       this.transport = nodemailer.createTransport({
         service: 'gmail',
@@ -18,11 +17,11 @@ module.exports = class Mail {
 
       this.send = (to, templateName, data = {}) => {
         if (!to || !templateName)
-          return console.error(`📧 mail to or template name not provided`)
+          return console.error(`📧 Mail to or template name not provided`)
 
         let template = this.templates[templateName]
         if (!template)
-          return console.error(`📧 mail template not found ${template}`)
+          return console.error(`📧 Mail template not found ${template}`)
 
         let subject =
           templateName[0].toUpperCase() +
@@ -41,9 +40,8 @@ module.exports = class Mail {
         })
       }
 
+      const mailPath = config.get('mail.path') || DEFAULT_PATH
       const mailDir = process.env.PWD + '/' + mailPath
-      console.info(`📧 mail reading from ${mailDir}`)
-
       this.templates = {}
       try {
         fs.readdirSync(mailDir).forEach((mailFile) => {
@@ -53,16 +51,14 @@ module.exports = class Mail {
             )
             const templateName = mailFile.replace('.html', '')
             this.templates[templateName] = template.toString()
-
-            console.info(`📧 mail loaded ${mailFile}`)
           }
         })
       } catch (e) {
-        console.info(`📧 mail not loaded ${e}`)
+        console.error(`📧 Mail  ERROR ${e}`)
       }
-    } else {
-      console.info(`📧 mail no config found`)
     }
-    console.info(`📧 mail init done`)
+
+    const templateNames = Object.keys(this.templates)
+    templateNames.length && console.info(`📧 Mail READY ${templateNames}`)
   }
 }
