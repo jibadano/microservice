@@ -131,7 +131,7 @@ module.exports = class Controller {
     })
 
     console.info(
-      `🕹Controller READY  ${this.routes.map(
+      `🕹 Controller READY  ${this.routes.map(
         (r) => `\n\t${r.path}  ${r.method}`
       )} ${graphqlServices.map((s) => `\n\tgraphql ${s}`)}`
     )

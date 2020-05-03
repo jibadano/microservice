@@ -36,7 +36,10 @@ module.exports = class Config {
   async refresh() {
     if (!this.remote && this.remoteUrl) {
       mongoose
-        .connect(this.remoteUrl, { useNewUrlParser: true })
+        .connect(this.remoteUrl, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true
+        })
         .catch((e) => console.error)
       this.remote = mongoose.model(
         'Config',
@@ -83,7 +86,7 @@ module.exports = class Config {
     values.lastModified = new Date()
     values.version = packageVersion
     console.info(
-      `🎛Config READY ${this.moduleName} ${env} ${new Date().toISOString()}`
+      `🎛 Config READY ${this.moduleName} ${env} ${new Date().toISOString()}`
     )
 
     this.values = values

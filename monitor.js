@@ -37,7 +37,10 @@ module.exports = class Monitor {
       if (mongoPath && monitorConfig.mode !== MODES.CONSOLE) {
         this.mode = MODES.DB
         mongoose
-          .connect(mongoPath, { useNewUrlParser: true })
+          .connect(mongoPath, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+          })
           .catch((e) => console.error(`📝Monitor  READY mode=${e}`))
 
         this.Log = mongoose.model('Log', LogSchema)

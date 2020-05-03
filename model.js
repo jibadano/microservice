@@ -6,7 +6,10 @@ module.exports = class Model {
   constructor(config) {
     const modelPath = config.get('model.path') || DEFAULT_PATH
     mongoose
-      .connect(config.get('mongo'), { useNewUrlParser: true })
+      .connect(config.get('mongo'), {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      })
       .catch((e) => console.error(`🌎 Model  ERROR ${e}`))
 
     const modelDir = process.env.PWD + '/' + modelPath
