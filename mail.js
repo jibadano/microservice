@@ -59,6 +59,7 @@ module.exports = class Mail {
     }
 
     const templateNames = Object.keys(this.templates)
-    templateNames.length && console.info(`📧 Mail READY ${templateNames}`)
+    templateNames.length &&
+      console.info(`📧 Mail READY ${templateNames.map((t) => `\n\t${t}`)}`)
   }
 }
