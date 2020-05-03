@@ -8,6 +8,7 @@ module.exports = class Middleware {
 
     this.list = []
     const middlewareDir = process.env.PWD + '/' + middlewarePath
+    const middlewares = []
     try {
       fs.readdirSync(middlewareDir).forEach((middlewareFile) => {
         if (middlewareFile !== 'index.js') {
@@ -18,12 +19,14 @@ module.exports = class Middleware {
           if (middleware instanceof Array)
             this.list = this.list.concat(middleware)
           else if (middleware) this.list.push(middleware)
+
+          if (middleware) middlewares.push(middlewareFile.replace('.js', ''))
         }
       })
     } catch (e) {
       console.error(`🔗 Middleware  ERROR ${e}`)
     }
 
-    this.list.length && console.info(`🔗 Middleware READY ${this.list}`)
+    this.list.length && console.info(`🔗 Middleware READY ${middlewares}`)
   }
 }

@@ -22,9 +22,7 @@ module.exports = class Context {
             })
         }
       })
-    } catch (e) {
-      console.error(`📰 Context ERROR ${e}`)
-    }
+    } catch (e) {}
 
     this.handlers.length &&
       console.info(`📰 Context  READY ${this.handlers.map((h) => h.name)}`)

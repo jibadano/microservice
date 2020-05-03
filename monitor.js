@@ -19,23 +19,23 @@ const TraceSchema = new mongoose.Schema({
   environment: String
 })
 
-module.exports = class Monitor {
-  static MODES = {
-    OFF: 'off',
-    CONSOLE: 'console',
-    DB: 'db'
-  }
+const MODES = {
+  OFF: 'off',
+  CONSOLE: 'console',
+  DB: 'db'
+}
 
+module.exports = class Monitor {
   constructor(config) {
     const monitorConfig = config.get('monitor')
 
-    if (!monitorConfig || monitorConfig.mode === this.MODES.OFF) {
-      this.mode = this.MODES.OFF
+    if (!monitorConfig || monitorConfig.mode === MODES.OFF) {
+      this.mode = MODES.OFF
     } else {
       const mongoPath = monitorConfig.mongo
       this.module = config.moduleName
-      if (mongoPath && monitorConfig.mode !== this.MODES.CONSOLE) {
-        this.mode = this.MODES.DB
+      if (mongoPath && monitorConfig.mode !== MODES.CONSOLE) {
+        this.mode = MODES.DB
         mongoose
           .connect(mongoPath, { useNewUrlParser: true })
           .catch((e) => console.error(`📝 Monitor  READY mode=${e}`))
@@ -43,7 +43,7 @@ module.exports = class Monitor {
         this.Log = mongoose.model('Log', LogSchema)
         this.Trace = mongoose.model('Trace', TraceSchema)
       } else {
-        this.mode = this.MODES.CONSOLE
+        this.mode = MODES.CONSOLE
       }
     }
 

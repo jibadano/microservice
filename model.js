@@ -17,7 +17,7 @@ module.exports = class Model {
         let schemaName = schemaFile.replace('.js', '')
         schemaName = schemaName.charAt(0).toUpperCase() + schemaName.slice(1)
         this[schemaName] = mongoose.model(schemaName, schema)
-        schemas.push(schameName)
+        schemas.push(schemaName)
       }
     })
 
