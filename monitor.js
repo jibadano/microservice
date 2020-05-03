@@ -38,7 +38,7 @@ module.exports = class Monitor {
         this.mode = MODES.DB
         mongoose
           .connect(mongoPath, { useNewUrlParser: true })
-          .catch((e) => console.error(`📝 Monitor  READY mode=${e}`))
+          .catch((e) => console.error(`📝Monitor  READY mode=${e}`))
 
         this.Log = mongoose.model('Log', LogSchema)
         this.Trace = mongoose.model('Trace', TraceSchema)
@@ -47,7 +47,7 @@ module.exports = class Monitor {
       }
     }
 
-    this.mode != 'off' && console.info(`📝 Monitor  READY mode=${this.mode}`)
+    this.mode != 'off' && console.info(`📝Monitor READY mode=${this.mode}`)
   }
 
   log(message, trace, data, type = 'info') {

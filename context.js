@@ -25,6 +25,8 @@ module.exports = class Context {
     } catch (e) {}
 
     this.handlers.length &&
-      console.info(`📰 Context  READY ${this.handlers.map((h) => h.name)}`)
+      console.info(
+        `📰Context  READY ${this.handlers.map((h) => `\n\t${h.name}`)}`
+      )
   }
 }

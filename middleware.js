@@ -23,10 +23,8 @@ module.exports = class Middleware {
           if (middleware) middlewares.push(middlewareFile.replace('.js', ''))
         }
       })
-    } catch (e) {
-      console.error(`🔗 Middleware  ERROR ${e}`)
-    }
+    } catch (e) {}
 
-    this.list.length && console.info(`🔗 Middleware READY ${middlewares}`)
+    this.list.length && console.info(`🔗Middleware  READY ${middlewares}`)
   }
 }

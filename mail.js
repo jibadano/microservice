@@ -53,13 +53,11 @@ module.exports = class Mail {
             this.templates[templateName] = template.toString()
           }
         })
-      } catch (e) {
-        console.error(`📧 Mail  ERROR ${e}`)
-      }
+      } catch (e) {}
     }
 
     const templateNames = Object.keys(this.templates)
     templateNames.length &&
-      console.info(`📧 Mail READY ${templateNames.map((t) => `\n\t${t}`)}`)
+      console.info(`📧Mail  READY ${templateNames.map((t) => `\n\t${t}`)}`)
   }
 }

@@ -21,6 +21,7 @@ module.exports = class Model {
       }
     })
 
-    schemas.length && console.info(`🌎 Model  READY ${schemas}`)
+    schemas.length &&
+      console.info(`🌎Model READY ${schemas.map((s) => `\n\t${s}`)}`)
   }
 }
