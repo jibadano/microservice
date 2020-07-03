@@ -1,6 +1,6 @@
 {
   "name": "@jibadano/microservice",
-  "version": "0.1.52",
+  "version": "0.1.53",
   "main": "src/index.js",
   "scripts": {},
   "keywords": [],
@@ -12,7 +12,7 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "express-jwt": "^5.3.3",
-    "graphql": "^0.13.2",
+    "graphql": "^15.2.0",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
     "mongoose": "^5.1.4",
