@@ -1,14 +1,14 @@
 {
   "name": "@jibadano/microservice",
-  "version": "0.1.50",
+  "version": "0.1.52",
   "main": "src/index.js",
   "scripts": {},
   "keywords": [],
   "author": "jibadano@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "apollo-server": "^2.0.0-beta.2",
-    "apollo-server-express": "^2.0.0-rc.0",
+    "apollo-server": "^2.15.1",
+    "apollo-server-express": "^2.15.1",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "express-jwt": "^5.3.3",
