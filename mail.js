@@ -38,7 +38,9 @@ module.exports = class Mail {
             return console.error(`📧 Mail template not found ${template}`)
 
           let subjectTag = res.body.match(/SUBJECT_.*_SUBJECT/)
-          subjectTag = subjectTag && subjectTag[0]
+          subjectTag =
+            (subjectTag && subjectTag[0]) ||
+            `SUBJECT_${config.get('mail')}_SUBJECT`
 
           const subject = subjectTag
             .replace('SUBJECT_', '')
