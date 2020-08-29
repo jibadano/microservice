@@ -1,5 +1,7 @@
 const nodemailer = require('nodemailer')
 const request = require('request')
+const ms = require('.')
+
 module.exports = class Mail {
   constructor(config) {
     if (!config.get('mail')) {
@@ -46,12 +48,21 @@ module.exports = class Mail {
             .replace('SUBJECT_', '')
             .replace('_SUBJECT', '')
 
-          this.transport.sendMail({
-            from: this.from,
-            to,
-            subject,
-            html: res.body.replace(subjectTag, '')
-          })
+          this.transport
+            .sendMail({
+              from: this.from,
+              to,
+              subject,
+              html: res.body.replace(subjectTag, '')
+            })
+            .catch((err) =>
+              ms.monitor.log(
+                'Email failed',
+                'sendEmail',
+                { template, to, err: err.message },
+                'error'
+              )
+            )
         }
       )
     }

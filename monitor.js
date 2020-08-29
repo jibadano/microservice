@@ -55,7 +55,12 @@ module.exports = class Monitor {
 
   log(message, trace, data, type = 'info') {
     if (this.mode === 'off') return
-    const log = { trace, message, type, data }
+    const log = {
+      trace: typeof trace == 'object' ? trace : this.trace(trace),
+      message,
+      type,
+      data
+    }
     this.Log
       ? new this.Log(log).save()
       : console[type]('>', new Date(), trace, message, data)
