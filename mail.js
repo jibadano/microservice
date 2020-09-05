@@ -1,6 +1,5 @@
 const nodemailer = require('nodemailer')
 const request = require('request')
-const ms = require('.')
 
 module.exports = class Mail {
   constructor(config) {
@@ -56,7 +55,7 @@ module.exports = class Mail {
               html: res.body.replace(subjectTag, '')
             })
             .catch((err) =>
-              ms.monitor.log(
+              require('.').monitor.log(
                 'Email failed',
                 'sendEmail',
                 { template, to, err: err.message },
