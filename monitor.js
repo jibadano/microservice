@@ -36,15 +36,13 @@ module.exports = class Monitor {
       this.module = config.moduleName
       if (mongoPath && monitorConfig.mode !== MODES.CONSOLE) {
         this.mode = MODES.DB
-        mongoose
-          .connect(mongoPath, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-          })
-          .catch((e) => console.error(`📝Monitor  READY mode=${e}`))
+        const monitorConnection = mongoose.createConnection(mongoPath, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true
+        })
 
-        this.Log = mongoose.model('Log', LogSchema)
-        this.Trace = mongoose.model('Trace', TraceSchema)
+        this.Log = monitorConnection.model('Log', LogSchema)
+        this.Trace = monitorConnection.model('Trace', TraceSchema)
       } else {
         this.mode = MODES.CONSOLE
       }

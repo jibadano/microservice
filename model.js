@@ -5,12 +5,10 @@ const DEFAULT_PATH = 'src/model'
 module.exports = class Model {
   constructor(config) {
     const modelPath = config.get('model.path') || DEFAULT_PATH
-    mongoose
-      .connect(config.get('mongo'), {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      })
-      .catch((e) => console.error(`🌎 Model  ERROR ${e}`))
+    const modelConnection = mongoose.createConnection(config.get('mongo'), {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    })
 
     const modelDir = process.env.PWD + '/' + modelPath
     const schemas = []
@@ -19,7 +17,7 @@ module.exports = class Model {
         const schema = require(path.resolve(`${modelDir}/${schemaFile}`))
         let schemaName = schemaFile.replace('.js', '')
         schemaName = schemaName.charAt(0).toUpperCase() + schemaName.slice(1)
-        this[schemaName] = mongoose.model(schemaName, schema)
+        this[schemaName] = modelConnection.model(schemaName, schema)
         schemas.push(schemaName)
       }
     })

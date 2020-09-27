@@ -35,13 +35,11 @@ module.exports = class Config {
 
   async refresh() {
     if (!this.remote && this.remoteUrl) {
-      mongoose
-        .connect(this.remoteUrl, {
-          useNewUrlParser: true,
-          useUnifiedTopology: true
-        })
-        .catch((e) => console.error)
-      this.remote = mongoose.model(
+      const configConnection = mongoose.createConnection(this.remoteUrl, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      })
+      this.remote = configConnection.model(
         'Config',
         new mongoose.Schema({
           development: Object,
