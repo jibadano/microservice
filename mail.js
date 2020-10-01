@@ -19,8 +19,9 @@ module.exports = class Mail {
         ? webConfig.url
         : 'http://localhost:' + webConfig.port
 
+    const transportConfig = config.get('mail.service') || { service: 'gmail' }
     this.transport = nodemailer.createTransport({
-      service: 'gmail',
+      ...transportConfig,
       auth: {
         user: config.get('mail.user'),
         pass: config.get('mail.pass')
