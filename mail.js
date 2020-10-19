@@ -55,14 +55,7 @@ module.exports = class Mail {
               subject,
               html: res.body.replace(subjectTag, '')
             })
-            .catch((err) =>
-              require('.').monitor.log(
-                'Email failed',
-                'sendEmail',
-                { template, to, err: err.message },
-                'error'
-              )
-            )
+            .catch((err) => console.log('ERROR MAIL!!', err))
         }
       )
     }
