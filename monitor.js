@@ -55,13 +55,13 @@ module.exports = class Monitor {
             timestamp: {
               $lte: moment().subtract(parseInt(amount), unit).toDate()
             }
-          })
+          }).exec()
 
           this.Trace.deleteMany({
             date: {
               $lte: moment().subtract(parseInt(amount), unit).toDate()
             }
-          })
+          }).exec()
         }
       } else {
         this.mode = MODES.CONSOLE
