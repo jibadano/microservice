@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const moment = require('moment')
 const uuidv1 = require('uuid/v1')
 
 const LogSchema = new mongoose.Schema({
@@ -43,6 +44,25 @@ module.exports = class Monitor {
 
         this.Log = monitorConnection.model('Log', LogSchema)
         this.Trace = monitorConnection.model('Trace', TraceSchema)
+
+        if (monitorConfig.exp) {
+          let amount = monitorConfig.exp
+          let unit = 'milliseconds'
+          if (monitorConfig.exp.amount) amount = monitorConfig.exp.amount
+          if (monitorConfig.exp.unit) unit = monitorConfig.exp.unit
+
+          this.Log.deleteMany({
+            timestamp: {
+              $lte: moment().subtract(parseInt(amount), unit).toDate()
+            }
+          })
+
+          this.Trace.deleteMany({
+            date: {
+              $lte: moment().subtract(parseInt(amount), unit).toDate()
+            }
+          })
+        }
       } else {
         this.mode = MODES.CONSOLE
       }
@@ -54,10 +74,10 @@ module.exports = class Monitor {
   log(message, trace, data, type = 'info') {
     if (this.mode === 'off') return
     const log = {
-      trace: typeof trace == 'object' ? trace : this.trace(trace),
+      trace: typeof trace == 'object' ? trace._id : this.trace(trace),
       message,
       type,
-      data
+      data: typeof data == 'object' ? JSON.stringify(data) : data
     }
     this.Log
       ? new this.Log(log).save()

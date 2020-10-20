@@ -76,7 +76,7 @@ module.exports = class Microservice {
 
       req.trace = trace
       req.log = (message, body, type) => {
-        this.monitor.log(message, trace._id, body, type)
+        this.monitor.log(message, trace, body, type)
       }
       next()
     })
@@ -124,6 +124,10 @@ module.exports = class Microservice {
     })
 
     app.listen(port, host, () => {
+      this.monitor.log('Server ready', 'start up', {
+        name: this.config.get('name'),
+        date: new Date().toLocaleDateString()
+      })
       console.log(`🚀Server READY at ${host}:${port} `)
     })
     return this.server
