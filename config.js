@@ -17,6 +17,7 @@ const packageVersion = get(package, 'version')
 module.exports = class Config {
   constructor(config, moduleName = packageName) {
     this.moduleName = moduleName
+    this.values = {}
     try {
       const values = require(path.resolve('default.json'))
       this.setConfig(values)
@@ -24,13 +25,6 @@ module.exports = class Config {
 
     if (typeof config === 'string') this.remoteUrl = config
     else if (config instanceof Object) this.setConfig(config)
-  }
-
-  get(param) {
-    const key = env + (param ? `.${this.moduleName}.${param}` : '')
-    const value = get(this.values, key)
-
-    return value
   }
 
   async refresh() {
@@ -47,11 +41,30 @@ module.exports = class Config {
           production: Object
         })
       )
+      this.remoteSettings = configConnection.model(
+        'Setting',
+        new mongoose.Schema({
+          value: Object
+        })
+      )
     }
 
     if (this.remote) {
-      const conf = await this.remote.findOne().exec().catch(console.error)
-      this.setConfig(conf)
+      const configData = await this.remote
+        .findOne()
+        .select(env)
+        .exec()
+        .then((c) => c[env])
+        .catch(console.error)
+      this.setConfig(configData)
+    }
+
+    if (this.remoteSettings) {
+      const settings = await this.remoteSettings
+        .find()
+        .exec()
+        .catch(console.error)
+      this.setSettings(settings)
     }
 
     return true
@@ -61,28 +74,37 @@ module.exports = class Config {
     await this.refresh()
   }
 
-  setConfig(values) {
-    if (!values) return null
+  setSettings(newSettings = []) {
+    const settings = {}
+    for (let setting of newSettings) settings[setting._id] = setting.value
+
+    this.values.settings = settings
+  }
+
+  get(param, moduleName = this.moduleName) {
+    const key = param ? `.${moduleName}.${param}` : ''
+    const value = get(this.values, key)
+
+    return value
+  }
+
+  setConfig(values = {}) {
     const mergePolicy = (objValue, srcValue) =>
       typeof objValue == 'object'
         ? merge(objValue, srcValue, mergePolicy)
         : objValue
 
-    for (let env of environments) {
-      if (values[env]) {
-        let def = values[env].default
-        if (def)
-          for (let mod in values[env]) {
-            if (mod != 'default') {
-              const modConfig = values[env][mod]
-              values[env][mod] = merge(modConfig, def, mergePolicy)
-            }
-          }
+    let def = values.default
+    if (def)
+      for (let mod in values) {
+        if (mod != 'default') {
+          const modConfig = values[mod]
+          values[mod] = merge(modConfig, def, mergePolicy)
+        }
       }
-    }
 
-    values[env][this.moduleName].lastModified = new Date().toISOString()
-    values[env][this.moduleName].version = packageVersion
+    values[this.moduleName].lastModified = new Date().toISOString()
+    values[this.moduleName].version = packageVersion
     console.info(
       `🎛 Config READY ${this.moduleName} ${env} ${new Date().toISOString()}`
     )
