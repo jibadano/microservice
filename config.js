@@ -83,7 +83,7 @@ module.exports = class Config {
   }
 
   get(param, moduleName = this.moduleName) {
-    const key = param ? `.${moduleName}.${param}` : ''
+    const key = param ? `${moduleName}.${param}` : ''
     const value = get(this.values, key)
 
     return value
