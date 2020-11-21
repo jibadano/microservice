@@ -44,6 +44,7 @@ module.exports = class Config {
       this.remoteSettings = configConnection.model(
         'Setting',
         new mongoose.Schema({
+          _id: String,
           value: Object
         })
       )
