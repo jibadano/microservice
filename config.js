@@ -79,7 +79,7 @@ module.exports = class Config {
     const settings = {}
     for (let setting of newSettings) settings[setting._id] = setting.value
 
-    this.values.settings = settings
+    this.values[this.moduleName].settings = settings
   }
 
   get(param, moduleName = this.moduleName) {
