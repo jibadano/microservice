@@ -13,7 +13,7 @@ module.exports = class Mail {
       address: config.get('mail.user')
     }
 
-    const webConfig = config.get().web
+    const webConfig = config.get(null, 'web')
     this.baseUrl =
       webConfig && webConfig.url
         ? webConfig.url
