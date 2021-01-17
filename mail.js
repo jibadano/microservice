@@ -59,6 +59,19 @@ module.exports = class Mail {
         }
       )
     }
+
+    this.sendPlain = (to, subject, text) => {
+      if (!to || !text) return console.error(`📧 Mail to or text not provided`)
+
+      this.transport
+        .sendMail({
+          from: this.from,
+          to,
+          subject,
+          text
+        })
+        .catch((err) => console.log('ERROR MAIL!!', err))
+    }
     console.info(`📧Mail  READY`)
   }
 }
