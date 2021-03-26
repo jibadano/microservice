@@ -12,16 +12,19 @@ module.exports = class Model {
 
     const modelDir = process.env.PWD + '/' + modelPath
     const schemas = []
-    fs.readdirSync(modelDir).forEach((schemaFile) => {
-      if (schemaFile !== 'index.js') {
-        const schema = require(path.resolve(`${modelDir}/${schemaFile}`))
-        let schemaName = schemaFile.replace('.js', '')
-        schemaName = schemaName.charAt(0).toUpperCase() + schemaName.slice(1)
-        this[schemaName] = modelConnection.model(schemaName, schema)
-        schemas.push(schemaName)
-      }
-    })
-
+    try {
+      fs.readdirSync(modelDir).forEach((schemaFile) => {
+        if (schemaFile !== 'index.js') {
+          const schema = require(path.resolve(`${modelDir}/${schemaFile}`))
+          let schemaName = schemaFile.replace('.js', '')
+          schemaName = schemaName.charAt(0).toUpperCase() + schemaName.slice(1)
+          this[schemaName] = modelConnection.model(schemaName, schema)
+          schemas.push(schemaName)
+        }
+      })
+    } catch (e) {
+      //ignore
+    }
     schemas.length &&
       console.info(`🌎Model READY ${schemas.map((s) => `\n\t${s}`)}`)
   }
