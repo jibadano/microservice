@@ -81,55 +81,61 @@ module.exports = class Microservice {
       next()
     })
 
+    // Request log
     app.use((req, res, next) => {
       req.log('request', req.body.query)
       next()
     })
 
+    // Custom services
     this.controller.routes.forEach(({ method, path, handler }) => {
       if (!['get', 'post', 'put', 'delete', 'all'].includes(method)) return
       if (path == graphqlPath) return
       app[method](path, handler)
     })
 
-    this.server = new ApolloServer(this.controller)
-    this.server.createGraphQLServerOptions = (req, res) => {
-      const context = {}
-      this.context.handlers.forEach((contextItem) => {
-        context[contextItem.name] = contextItem.handler(req, res)
-      })
+    //Graphql services
+    if (this.controller.resolvers && this.controller.resolvers.length > 1) {
+      this.server = new ApolloServer(this.controller)
+      this.server.createGraphQLServerOptions = (req, res) => {
+        const context = {}
+        this.context.handlers.forEach((contextItem) => {
+          context[contextItem.name] = contextItem.handler(req, res)
+        })
 
-      return {
-        schema: this.server.schema,
-        context: {
-          session: req.user,
-          trace: req.trace,
-          log: req.log,
-          ...context
-        },
-        formatError: (res) => {
-          req.log('response', JSON.stringify(res.data), 'error')
-          return res
-        },
-        formatResponse: (res) => {
-          req.log('response', JSON.stringify(res.data))
-          return res
+        return {
+          schema: this.server.schema,
+          context: {
+            session: req.user,
+            trace: req.trace,
+            log: req.log,
+            ...context
+          },
+          formatError: (res) => {
+            req.log('response', JSON.stringify(res.data), 'error')
+            return res
+          },
+          formatResponse: (res) => {
+            req.log('response', JSON.stringify(res.data))
+            return res
+          }
         }
       }
-    }
 
-    this.server.applyMiddleware({
-      app,
-      path: graphqlPath
-    })
+      this.server.applyMiddleware({
+        app,
+        path: graphqlPath
+      })
+    }
 
     app.listen(port, host, () => {
       this.monitor.log('Server ready', 'start up', {
         name: this.config.get('name'),
         date: new Date().toLocaleDateString()
       })
-      console.log(`🚀Server READY at ${host}:${port} `)
+      console.log(`🚀 Server READY at ${host}:${port} `)
     })
+
     return this.server
   }
 
