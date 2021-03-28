@@ -89,7 +89,7 @@ module.exports = class Monitor {
           new Date(),
           trace._id,
           message,
-          data ? '\n' + data : ''
+          data && data.indexOf('\n') > 0 ? '\n' + data : data
         )
   }
 
@@ -108,7 +108,7 @@ module.exports = class Monitor {
       this.Trace
         ? new this.Trace(trace).save()
         : console.log(
-            '+',
+            '>>>',
             date,
             trace._id,
             trace.operation,
