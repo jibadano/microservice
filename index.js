@@ -83,7 +83,8 @@ module.exports = class Microservice {
 
     // Request log
     app.use((req, res, next) => {
-      req.log('request', req.body.query)
+      !req.body.query.startsWith('query IntrospectionQuery') &&
+        req.log('request', req.body.query)
       next()
     })
 
@@ -116,7 +117,9 @@ module.exports = class Microservice {
             return res
           },
           formatResponse: (res) => {
-            req.log('response', JSON.stringify(res.data))
+            res.data &&
+              !res.data.__schema &&
+              req.log('response', JSON.stringify(res.data))
             return res
           }
         }
