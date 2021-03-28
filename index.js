@@ -68,6 +68,9 @@ module.exports = class Microservice {
 
     // Tracing
     app.use((req, res, next) => {
+      if (req && req.body && req.body.operationName == 'IntrospectionQuery')
+        return next()
+
       const trace = this.monitor.trace(
         req.body.operationName,
         req.user && req.user.user && req.user.user._id,
@@ -83,8 +86,7 @@ module.exports = class Microservice {
 
     // Request log
     app.use((req, res, next) => {
-      !req.body.query.startsWith('query IntrospectionQuery') &&
-        req.log('request', req.body.query)
+      req.log && req.log('request', req.body.query)
       next()
     })
 
@@ -113,13 +115,11 @@ module.exports = class Microservice {
             ...context
           },
           formatError: (res) => {
-            req.log('response', JSON.stringify(res.data), 'error')
+            req.log && req.log('response', JSON.stringify(res.data), 'error')
             return res
           },
           formatResponse: (res) => {
-            res.data &&
-              !res.data.__schema &&
-              req.log('response', JSON.stringify(res.data))
+            req.log && req.log('response', JSON.stringify(res.data))
             return res
           }
         }

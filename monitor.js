@@ -73,15 +73,24 @@ module.exports = class Monitor {
 
   log(message, trace, data, type = 'info') {
     if (this.mode === 'off') return
+
+    trace = typeof trace == 'object' ? trace : this.trace(trace)
+    data = typeof data == 'object' ? JSON.stringify(data) : data
     const log = {
-      trace: typeof trace == 'object' ? trace._id : this.trace(trace),
+      trace: trace._id,
       message,
       type,
-      data: typeof data == 'object' ? JSON.stringify(data) : data
+      data
     }
     this.Log
       ? new this.Log(log).save()
-      : console[type]('>', new Date(), trace, message, data)
+      : console[type](
+          '>',
+          new Date(),
+          trace._id,
+          message,
+          data ? '\n' + data : ''
+        )
   }
 
   trace(operation, user, ip, date = new Date()) {
@@ -99,7 +108,7 @@ module.exports = class Monitor {
       this.Trace
         ? new this.Trace(trace).save()
         : console.log(
-            '>',
+            '+',
             date,
             trace._id,
             trace.operation,
