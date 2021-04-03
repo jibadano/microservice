@@ -86,7 +86,7 @@ module.exports = class Microservice {
 
     // Request log
     app.use((req, res, next) => {
-      req.log && req.log('request', req.body.query)
+      req.log && req.log('Request', req.body.query)
       next()
     })
 
@@ -115,11 +115,11 @@ module.exports = class Microservice {
             ...context
           },
           formatError: (res) => {
-            req.log && req.log('response', JSON.stringify(res.data), 'error')
+            req.log && req.log('Response', JSON.stringify(res), 'error')
             return res
           },
           formatResponse: (res) => {
-            req.log && req.log('response', JSON.stringify(res.data))
+            req.log && req.log('Response', JSON.stringify(res.data))
             return res
           }
         }
