@@ -45,7 +45,7 @@ module.exports = class Microservice {
     })
 
     // Body parser
-    app.use(bodyParser.json())
+    app.use(bodyParser.json(this.config.get('bodyParser.json')))
 
     //Set middlewares
     this.middleware.list.forEach((mw) => app.use(mw))
