@@ -76,7 +76,7 @@ module.exports = class Monitor {
         this.Trace.updateOne(
           { _id: trace._id },
           { $push: { logs: { message, data, type } } }
-        )
+        ).exec()
       else console.log('>', Date.now(), trace._id, message, data)
 
       return
