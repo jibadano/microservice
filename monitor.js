@@ -95,11 +95,18 @@ module.exports = class Monitor {
     trace.date = Date.now()
     trace.module = this.module
     trace.environment = process.env.NODE_ENV
+    trace.logs = [
+      {
+        message,
+        data,
+        type
+      }
+    ]
 
     if (this.Trace) {
       new this.Trace(trace).save()
     } else {
-      console.log(
+      console.info(
         '>>>',
         trace.date,
         trace._id,
@@ -109,7 +116,7 @@ module.exports = class Monitor {
         trace.module,
         trace.environment
       )
-      console.log('>', Date.now(), trace._id, message, data)
+      console[type]('>', Date.now(), trace._id, message, data)
     }
 
     return trace
