@@ -71,22 +71,20 @@ module.exports = class Microservice {
       if (req && req.body && req.body.operationName == 'IntrospectionQuery')
         return next()
 
-      const trace = this.monitor.trace(
-        req.body.operationName,
-        req.user && req.user.user && req.user.user._id,
-        req.headers['x-forwarded-for'] || req.connection.remoteAddress
+      const trace = this.monitor.log(
+        'Request',
+        {
+          operation: req.body.operationName,
+          user: req.user && req.user.user && req.user.user._id,
+          ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+        },
+        req.body.query
       )
 
       req.trace = trace
       req.log = (message, body, type) => {
         this.monitor.log(message, trace, body, type)
       }
-      next()
-    })
-
-    // Request log
-    app.use((req, res, next) => {
-      req.log && req.log('Request', req.body.query)
       next()
     })
 

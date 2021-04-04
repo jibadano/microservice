@@ -1,6 +1,6 @@
 {
   "name": "@jibadano/microservice",
-  "version": "0.1.76",
+  "version": "0.1.77",
   "main": "src/index.js",
   "scripts": {},
   "keywords": [],

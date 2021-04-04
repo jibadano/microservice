@@ -2,14 +2,6 @@ const mongoose = require('mongoose')
 const moment = require('moment')
 const uuidv1 = require('uuid/v1')
 
-const LogSchema = new mongoose.Schema({
-  trace: { type: String, ref: 'Trace' },
-  timestamp: { type: Date, default: Date.now },
-  message: String,
-  data: String,
-  type: String
-})
-
 const TraceSchema = new mongoose.Schema({
   _id: String,
   user: String,
@@ -17,7 +9,15 @@ const TraceSchema = new mongoose.Schema({
   ip: String,
   module: String,
   date: { type: Date, default: Date.now },
-  environment: String
+  environment: String,
+  logs: [
+    {
+      timestamp: { type: Date, default: Date.now },
+      message: String,
+      data: mongoose.Schema.Types.Mixed,
+      type: String
+    }
+  ]
 })
 
 const MODES = {
@@ -42,7 +42,6 @@ module.exports = class Monitor {
           useUnifiedTopology: true
         })
 
-        this.Log = monitorConnection.model('Log', LogSchema)
         this.Trace = monitorConnection.model('Trace', TraceSchema)
 
         if (monitorConfig.exp) {
@@ -50,12 +49,6 @@ module.exports = class Monitor {
           let unit = 'milliseconds'
           if (monitorConfig.exp.amount) amount = monitorConfig.exp.amount
           if (monitorConfig.exp.unit) unit = monitorConfig.exp.unit
-
-          this.Log.deleteMany({
-            timestamp: {
-              $lte: moment().subtract(parseInt(amount), unit).toDate()
-            }
-          }).exec()
 
           this.Trace.deleteMany({
             date: {
@@ -74,49 +67,50 @@ module.exports = class Monitor {
   log(message, trace, data, type = 'info') {
     if (this.mode === 'off') return
 
-    trace = typeof trace == 'object' ? trace : this.trace(trace)
-    data = typeof data == 'object' ? JSON.stringify(data) : data
-    const log = {
-      trace: trace._id,
-      message,
-      type,
-      data
-    }
-    this.Log
-      ? new this.Log(log).save()
-      : console[type](
-          '>',
-          new Date(),
-          trace._id,
-          message,
-          data && data.indexOf('\n') > 0 ? '\n' + data : data
+    let logData = typeof data == 'object' ? JSON.stringify(data) : data
+    logData = logData && logData.indexOf('\n') > 0 ? '\n' + logData : logData
+
+    if (typeof trace == 'object' && trace._id) {
+      //Is an update
+      if (this.Trace)
+        this.Trace.updateOne(
+          { _id: trace._id },
+          { $push: { logs: { message, data, type } } }
         )
-  }
+      else console.log('>', Date.now(), trace._id, message, data)
 
-  trace(operation, user, ip, date = new Date()) {
-    const trace = {
-      _id: uuidv1(),
-      operation,
-      user,
-      ip,
-      date,
-      environment: process.env.NODE_ENV,
-      module: this.module
+      return
     }
 
-    if (this.mode !== 'off')
-      this.Trace
-        ? new this.Trace(trace).save()
-        : console.log(
-            '>>>',
-            date,
-            trace._id,
-            trace.operation,
-            trace.user,
-            trace.ip,
-            trace.module,
-            trace.environment
-          )
+    //New log
+
+    if (typeof trace != 'object') {
+      //Is an in line log
+      trace = {
+        operation: trace
+      }
+    }
+
+    trace._id = uuidv1()
+    trace.date = Date.now()
+    trace.module = this.module
+    trace.environment = process.env.NODE_ENV
+
+    if (this.Trace) {
+      new this.Trace(trace).save()
+    } else {
+      console.log(
+        '>>>',
+        trace.date,
+        trace._id,
+        trace.operation,
+        trace.user,
+        trace.ip,
+        trace.module,
+        trace.environment
+      )
+      console.log('>', Date.now(), trace._id, message, data)
+    }
 
     return trace
   }
