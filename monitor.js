@@ -15,7 +15,7 @@ const TraceSchema = new mongoose.Schema({
       timestamp: { type: Date, default: Date.now },
       message: String,
       data: mongoose.Schema.Types.Mixed,
-      type: String
+      type: { type: String, enum: ['log', 'info', 'error', 'warning'] }
     }
   ]
 })

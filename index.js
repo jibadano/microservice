@@ -130,7 +130,7 @@ module.exports = class Microservice {
     }
 
     app.listen(port, host, () => {
-      this.monitor.log('Server ready', 'start up', {
+      this.monitor.log('Server ready', 'Start up', {
         name: this.config.get('name'),
         date: new Date().toLocaleDateString()
       })
