@@ -42,8 +42,10 @@ module.exports = class Config {
     if (this.remote) {
       const configList = await this.remote.find().exec().catch(console.error)
 
-      const mainConfig = configList.find(({ _id }) => _id == 'main')
-      const settingsConfig = configList.find(({ _id }) => _id == 'settings')
+      const mainConfig = configList.find(({ _id }) => _id == 'main').toObject()
+      const settingsConfig = configList
+        .find(({ _id }) => _id == 'settings')
+        .toObject()
       this.setConfig(mainConfig)
       this.setSettings(settingsConfig)
     }
