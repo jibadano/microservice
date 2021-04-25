@@ -35,7 +35,7 @@ module.exports = class Config {
       })
       this.remote = configConnection.model(
         'Config',
-        mongoose.Schema.Types.Mixed
+        new mongoose.Schema({ _id: String, any: mongoose.Schema.Types.Mixed })
       )
     }
 
@@ -70,14 +70,14 @@ module.exports = class Config {
         if (mod != 'default') {
           const modConfig = values[mod]
           values[mod] = merge(modConfig, def, mergePolicy)
+
+          if (!values[mod]['url']) {
+            let url = values[mod]['host'] || 'http://localhost'
+            url += values[mod]['port'] ? ':' + values[mod]['port'] : ''
+            values[mod]['url'] = url
+          }
         }
       }
-
-    if (!values[this.moduleName]['url']) {
-      let url = values[this.moduleName]['host'] || 'http://localhost'
-      url += values[this.moduleName]['port'] || ''
-      values[this.moduleName]['url'] = url
-    }
 
     values[this.moduleName].lastModified = new Date().toISOString()
     values[this.moduleName].version = packageVersion
