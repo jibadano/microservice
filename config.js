@@ -27,7 +27,7 @@ module.exports = class Config {
     else if (config instanceof Object) this.setConfig(config)
   }
 
-  async refresh() {
+  async init() {
     if (!this.remote && this.remoteUrl) {
       const configConnection = mongoose.createConnection(this.remoteUrl, {
         useNewUrlParser: true,
@@ -35,51 +35,20 @@ module.exports = class Config {
       })
       this.remote = configConnection.model(
         'Config',
-        new mongoose.Schema({
-          development: Object,
-          staging: Object,
-          production: Object
-        })
-      )
-      this.remoteSettings = configConnection.model(
-        'Setting',
-        new mongoose.Schema({
-          _id: String,
-          value: Object
-        })
+        mongoose.Schema.Types.Mixed
       )
     }
 
     if (this.remote) {
-      const configData = await this.remote
-        .findOne()
-        .select(env)
-        .exec()
-        .then((c) => c[env])
-        .catch(console.error)
-      this.setConfig(configData)
-    }
+      const configList = await this.remote.find().exec().catch(console.error)
 
-    if (this.remoteSettings) {
-      const settings = await this.remoteSettings
-        .find()
-        .exec()
-        .catch(console.error)
-      this.setSettings(settings)
+      const mainConfig = configList.find(({ _id }) => _id == 'main')
+      const settingsConfig = configList.find(({ _id }) => _id == 'settings')
+      this.setConfig(mainConfig)
+      this.setSettings(settingsConfig)
     }
 
     return true
-  }
-
-  async init() {
-    await this.refresh()
-  }
-
-  setSettings(newSettings = []) {
-    const settings = {}
-    for (let setting of newSettings) settings[setting._id] = setting.value
-
-    this.values[this.moduleName].settings = settings
   }
 
   get(param, moduleName = this.moduleName) {
@@ -89,6 +58,7 @@ module.exports = class Config {
   }
 
   setConfig(values = {}) {
+    delete values._id
     const mergePolicy = (objValue, srcValue) =>
       typeof objValue == 'object'
         ? merge(objValue, srcValue, mergePolicy)
@@ -103,6 +73,12 @@ module.exports = class Config {
         }
       }
 
+    if (!values[this.moduleName]['url']) {
+      let url = values[this.moduleName]['host'] || 'http://localhost'
+      url += values[this.moduleName]['port'] || ''
+      values[this.moduleName]['url'] = url
+    }
+
     values[this.moduleName].lastModified = new Date().toISOString()
     values[this.moduleName].version = packageVersion
     console.info(
@@ -110,5 +86,22 @@ module.exports = class Config {
     )
 
     this.values = values
+  }
+
+  async refreshSettings() {
+    if (this.remote) {
+      const settingsConfig = await this.remote
+        .findOne({ _id: 'settings' })
+        .exec()
+        .catch(console.error)
+
+      this.setSettings(settingsConfig)
+    }
+    return true
+  }
+
+  setSettings(settings = {}) {
+    delete settings._id
+    this.values[this.moduleName].settings = settings
   }
 }

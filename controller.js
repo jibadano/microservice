@@ -73,7 +73,7 @@ module.exports = class Controller {
         }
 
         type Mutation {
-          refreshConfig: Boolean
+          refreshSettings: Boolean
         }
 
         enum Role {
@@ -90,7 +90,7 @@ module.exports = class Controller {
           version: () => config.get('version')
         },
         Mutation: {
-          refreshConfig: () => config.refresh()
+          refreshSettings: () => config.refreshSettings()
         }
       }
     ]
