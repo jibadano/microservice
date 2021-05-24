@@ -65,7 +65,8 @@ module.exports = class Monitor {
   }
 
   log(message, trace, data, type = 'info') {
-    if (this.mode === 'off') return
+    if (this.mode === 'off')
+      return typeof trace == 'object' ? trace : { operation: trace }
 
     let logData = typeof data == 'object' ? JSON.stringify(data) : data
     logData = logData && logData.indexOf('\n') > 0 ? '\n' + logData : logData
