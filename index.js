@@ -68,6 +68,8 @@ module.exports = class Microservice {
 
     // Tracing
     app.use((req, res, next) => {
+      if (req && req.method == 'OPTIONS') return next()
+
       if (req && req.body && req.body.operationName == 'IntrospectionQuery')
         return next()
 
