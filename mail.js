@@ -31,33 +31,47 @@ module.exports = class Mail {
     this.send = (to, template, data = {}) => {
       if (!to || !template)
         return console.error(`📧 Mail to or template name not provided`)
+      return new Promise((resolve, reject) => {
+        request(
+          this.baseUrl,
+          { qs: { vr: 'email', template, ...data } },
+          (err, res) => {
+            if (err || !res.body) {
+              const message = `📧 Mail template not found ${template}`
+              console.error(message)
+              return reject(new Error(message))
+            }
 
-      request(
-        this.baseUrl,
-        { qs: { vr: 'email', template, ...data } },
-        (err, res) => {
-          if (err || !res.body)
-            return console.error(`📧 Mail template not found ${template}`)
+            let subjectTag = res.body.match(/SUBJECT_.*_SUBJECT/)
+            subjectTag =
+              (subjectTag && subjectTag[0]) ||
+              `SUBJECT_${config.get('mail')}_SUBJECT`
 
-          let subjectTag = res.body.match(/SUBJECT_.*_SUBJECT/)
-          subjectTag =
-            (subjectTag && subjectTag[0]) ||
-            `SUBJECT_${config.get('mail')}_SUBJECT`
+            const subject = subjectTag
+              .replace('SUBJECT_', '')
+              .replace('_SUBJECT', '')
 
-          const subject = subjectTag
-            .replace('SUBJECT_', '')
-            .replace('_SUBJECT', '')
+            let bodyTag = res.body.match(/BODY_.*_BODY/)
+            bodyTag =
+              (bodyTag && bodyTag[0]) || `BODY_${config.get('mail')}_BODY`
 
-          this.transport
-            .sendMail({
-              from: this.from,
-              to,
-              subject,
-              html: res.body.replace(subjectTag, '')
-            })
-            .catch((err) => console.log('ERROR MAIL!!', err))
-        }
-      )
+            let body = bodyTag.replace('BODY_', '').replace('_BODY', '')
+
+            this.transport
+              .sendMail({
+                from: this.from,
+                to,
+                subject,
+                html: body.replace(subjectTag, '')
+              })
+              .then(() => resolve())
+              .catch((err) => {
+                console.error('MAIL ERROR!', err)
+                return reject(err)
+              })
+          }
+        )
+      })
     }
 
     this.sendPlain = (to, subject, text) => {
