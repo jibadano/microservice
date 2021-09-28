@@ -76,6 +76,9 @@ module.exports = class Controller {
           refreshSettings: Boolean
         }
 
+        scalar Date
+        scalar LocalizedString
+
         enum Role {
           GUEST
           USER
