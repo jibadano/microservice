@@ -42,8 +42,6 @@ module.exports = class Mail {
               return reject(new Error(message))
             }
 
-            console.log(res.body)
-
             let subjectTag = res.body.match(/SUBJECT_.*_SUBJECT/)
             subjectTag = subjectTag && subjectTag[0]
 
