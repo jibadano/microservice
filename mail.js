@@ -42,27 +42,30 @@ module.exports = class Mail {
               return reject(new Error(message))
             }
 
+            console.log(res.body)
+
             let subjectTag = res.body.match(/SUBJECT_.*_SUBJECT/)
-            subjectTag =
-              (subjectTag && subjectTag[0]) ||
-              `SUBJECT_${config.get('mail')}_SUBJECT`
+            subjectTag = subjectTag && subjectTag[0]
+
+            if (!subjectTag) return reject(new Error('Subject not found'))
 
             const subject = subjectTag
               .replace('SUBJECT_', '')
               .replace('_SUBJECT', '')
 
-            let bodyTag = res.body.match(/BODY_.*_BODY/)
-            bodyTag =
-              (bodyTag && bodyTag[0]) || `BODY_${config.get('mail')}_BODY`
+            const start = res.body.indexOf('BODY_')
+            const end = res.body.indexOf('_BODY')
+            if (start == -1 || end == -1)
+              return reject(new Error('Body not found'))
 
-            let body = bodyTag.replace('BODY_', '').replace('_BODY', '')
+            let html = res.body.slice(start + 5, end)
 
             this.transport
               .sendMail({
                 from: this.from,
                 to,
                 subject,
-                html: body.replace(subjectTag, '')
+                html
               })
               .then(() => resolve())
               .catch((err) => {
