@@ -15,6 +15,7 @@ module.exports = class Microservice {
   constructor(config) {
     this.config = new Config(config)
     this.sign = () => {}
+    this.verify = () => {}
   }
 
   async init() {
@@ -60,6 +61,8 @@ module.exports = class Microservice {
           jwtOptions.secret,
           signOptions || jwtSignOptions
         )
+
+      this.verify = (token) => jsonwebtoken.verify(token, jwtOptions.secret)
 
       app.use((req, res, next) => {
         jwt(jwtOptions)(req, res, () => next())
