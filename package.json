@@ -1,7 +1,7 @@
 {
   "name": "@jibadano/microservice",
-  "version": "0.1.92",
-  "main": "src/index.js",
+  "version": "0.1.93",
+  "main": "index.js",
   "scripts": {},
   "keywords": [],
   "author": "jibadano@gmail.com",
@@ -31,6 +31,5 @@
   "bugs": {
     "url": "https://github.com/jibadano/microservice/issues"
   },
-  "homepage": "https://github.com/jibadano/microservice#readme",
-  "description": ""
+  "homepage": "https://github.com/jibadano/microservice#readme"
 }
