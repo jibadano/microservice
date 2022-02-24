@@ -15,7 +15,7 @@ const packageName = get(package, 'name')
 const packageVersion = get(package, 'version')
 
 module.exports = class Config {
-  constructor(config, moduleName = packageName) {
+  constructor(config, moduleName = process.env.APP || packageName) {
     this.moduleName = moduleName
     this.values = {}
     try {
@@ -83,6 +83,7 @@ module.exports = class Config {
 
     values[this.moduleName].lastModified = new Date().toISOString()
     values[this.moduleName].version = packageVersion
+    values[this.moduleName].name = this.moduleName
     console.info(
       `🎛 Config READY ${this.moduleName} ${env} ${new Date().toISOString()}`
     )

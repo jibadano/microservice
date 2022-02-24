@@ -10,8 +10,6 @@ const ROLES = {
   ADMIN: 2
 }
 
-const DEFAULT_PATH = 'src/services'
-
 const isAuthorized = (role, requiredRole) => ROLES[requiredRole] <= ROLES[role]
 
 class AuthDirective extends SchemaDirectiveVisitor {
@@ -63,7 +61,8 @@ class AuthDirective extends SchemaDirectiveVisitor {
 
 module.exports = class Controller {
   constructor(config) {
-    const servicesPath = config.get('services.path') || DEFAULT_PATH
+    const servicesPaths = config.get('services') || [config.get('name')]
+
     this.typeDefs = [
       gql`
         directive @auth(requires: Role = USER) on OBJECT | FIELD_DEFINITION
@@ -103,34 +102,36 @@ module.exports = class Controller {
       auth: AuthDirective
     }
 
-    const controllerDir = process.env.PWD + '/' + servicesPath
     const graphqlServices = []
-    fs.readdirSync(controllerDir).forEach((serviceFile) => {
-      if (serviceFile !== 'index.js') {
-        const service = require(path.resolve(`${controllerDir}/${serviceFile}`))
-        const serviceName = serviceFile.replace('.js', '')
-        if (service.typeDefs && service.resolvers) {
-          this.typeDefs.push(service.typeDefs)
-          this.resolvers.push(service.resolvers)
-          graphqlServices.push(serviceName)
-        } else if (typeof service === 'function')
-          this.routes.push({
-            method: 'all',
-            path: `/${serviceName}`,
-            handler: service
-          })
-        else {
-          const methods = Object.keys(service)
-          methods.forEach((method) => {
-            if (['get', 'post', 'put', 'delete', 'all'].includes(method))
-              this.routes.push({
-                method,
-                path: `/${serviceName}`,
-                handler: service[method]
-              })
-          })
+    servicesPaths.forEach((servicesPath) => {
+      const serviceDir = './' + servicesPath + '/services'
+      fs.readdirSync(serviceDir).forEach((serviceFile) => {
+        if (serviceFile !== 'index.js') {
+          const service = require(path.resolve(`${serviceDir}/${serviceFile}`))
+          const serviceName = serviceFile.replace('.js', '')
+          if (service.typeDefs && service.resolvers) {
+            this.typeDefs.push(service.typeDefs)
+            this.resolvers.push(service.resolvers)
+            graphqlServices.push(serviceName)
+          } else if (typeof service === 'function')
+            this.routes.push({
+              method: 'all',
+              path: `/${serviceName}`,
+              handler: service
+            })
+          else {
+            const methods = Object.keys(service)
+            methods.forEach((method) => {
+              if (['get', 'post', 'put', 'delete', 'all'].includes(method))
+                this.routes.push({
+                  method,
+                  path: `/${serviceName}`,
+                  handler: service[method]
+                })
+            })
+          }
         }
-      }
+      })
     })
 
     console.info(
