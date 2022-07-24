@@ -98,6 +98,7 @@ const typeDefs = gql`
   extend type Mutation {
     login(_id: ID, password: String, remember: Boolean): Token
     signup(_id: ID!, password: String!, role: Role): Credential
+    updatePassword(_id: ID!, password: String!): Token
   }
 `
 

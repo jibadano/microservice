@@ -36,7 +36,7 @@ module.exports = class Controller {
     this.graphqlServices = []
 
     fs.readdirSync(__dirname + '/services').forEach((serviceFile) => {
-      processService(
+      this.processService(
         __dirname + '/services/' + serviceFile,
         serviceFile.replace('.js', '')
       )
@@ -46,7 +46,7 @@ module.exports = class Controller {
       const serviceDir = './' + servicesPath + '/services'
       fs.readdirSync(serviceDir).forEach((serviceFile) => {
         if (serviceFile !== 'index.js')
-          processService(
+          this.processService(
             path.resolve(`${serviceDir}/${serviceFile}`),
             serviceFile.replace('.js', '')
           )
