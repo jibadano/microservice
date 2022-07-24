@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const jwt = require('express-jwt')
+const { expressjwt: jwt } = require('express-jwt')
 const jsonwebtoken = require('jsonwebtoken')
 const { ApolloServer } = require('apollo-server-express')
 const Model = require('./model')
