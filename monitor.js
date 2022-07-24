@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const moment = require('moment')
-const uuidv1 = require('uuid/v1')
+const { v1: uuidv1 } = require('uuid')
 const TraceSchema = require('./model/trace')
 
 const MODES = {
