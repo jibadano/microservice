@@ -1,8 +1,9 @@
 const fs = require('fs')
 const path = require('path')
+
 module.exports = class Context {
   constructor(config) {
-    const contextPaths = config.get('services') || [config.get('name')]
+    const contextPaths = config.get('selectedServices')
 
     this.handlers = []
 

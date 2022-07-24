@@ -1,24 +1,7 @@
 const mongoose = require('mongoose')
 const moment = require('moment')
 const uuidv1 = require('uuid/v1')
-
-const TraceSchema = new mongoose.Schema({
-  _id: String,
-  user: String,
-  operation: String,
-  ip: String,
-  module: String,
-  date: { type: Date, default: Date.now },
-  environment: String,
-  logs: [
-    {
-      timestamp: { type: Date, default: Date.now },
-      message: String,
-      data: mongoose.Schema.Types.Mixed,
-      type: { type: String, enum: ['log', 'info', 'error', 'warning'] }
-    }
-  ]
-})
+const TraceSchema = require('./model/trace')
 
 const MODES = {
   OFF: 'off',
@@ -37,6 +20,7 @@ module.exports = class Monitor {
       this.module = config.moduleName
       if (mongoPath && monitorConfig.mode !== MODES.CONSOLE) {
         this.mode = MODES.DB
+
         const monitorConnection = mongoose.createConnection(mongoPath, {
           useNewUrlParser: true,
           useUnifiedTopology: true

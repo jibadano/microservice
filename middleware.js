@@ -3,7 +3,7 @@ const path = require('path')
 
 module.exports = class Middleware {
   constructor(config) {
-    const middlewarePaths = config.get('services') || [config.get('name')]
+    const middlewarePaths = config.get('selectedServices')
 
     this.list = []
     const middlewares = []

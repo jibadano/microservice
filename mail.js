@@ -13,11 +13,8 @@ module.exports = class Mail {
       address: config.get('mail.user')
     }
 
-    const webConfig = config.get(null, 'web')
-    this.baseUrl =
-      webConfig && webConfig.url
-        ? webConfig.url
-        : 'http://localhost:' + webConfig.port
+    const webConfig = config.get('..apps.web')
+    this.baseUrl = webConfig.url
 
     const transportConfig = config.get('mail.service') || { service: 'gmail' }
     this.transport = nodemailer.createTransport({
