@@ -1,7 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@jibadano/config': 0.0.3
+  '@jibadano/config': 0.0.8
   '@types/node-fetch': '2'
   '@vercel/client': ^12.1.3
   apollo-server: ^3.10.0
@@ -21,7 +21,7 @@ specifiers:
   uuid: ^8.3.2
 
 dependencies:
-  '@jibadano/config': 0.0.3
+  '@jibadano/config': 0.0.8
   '@types/node-fetch': 2.6.2
   '@vercel/client': 12.1.3_@types+node-fetch@2.6.2
   apollo-server: 3.10.0_graphql@15.8.0
@@ -234,8 +234,8 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@jibadano/config/0.0.3:
-    resolution: {integrity: sha512-r+F+iIFplPRrS+V3RbkFqZe+SDdlaiWwXQ+QivE9by2aIRKI8qdqsIUMcy8m6OJze/9M7GWCZt1Nb2hmI6GcNQ==}
+  /@jibadano/config/0.0.8:
+    resolution: {integrity: sha512-AT0f7D6LgHQOrjdA4fuaTaW/x9dKKRiWGfNIS9V7dyfYpw4moqgK50eAluDwAoiIM/hOd3IC1IeC/1Rxoew60A==}
     dependencies:
       lodash: 4.17.21
       mongoose: 6.4.6
@@ -628,6 +628,7 @@ packages:
     transitivePeerDependencies:
       - '@types/node-fetch'
       - encoding
+      - supports-color
     dev: false
 
   /@vercel/routing-utils/2.0.0:
@@ -671,6 +672,8 @@ packages:
       async-retry: 1.3.3
       debug: 3.1.0
       node-fetch: 2.6.7
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /@zeit/fetch/5.2.0_b060e83a96d210c6fba181816daeccc8:
@@ -686,6 +689,8 @@ packages:
       agentkeepalive: 3.4.1
       debug: 3.1.0
       node-fetch: 2.6.7
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /accepts/1.3.8:
@@ -924,6 +929,7 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - supports-color
       - utf-8-validate
     dev: false
 
@@ -949,6 +955,7 @@ packages:
       parseurl: 1.3.3
     transitivePeerDependencies:
       - encoding
+      - supports-color
     dev: false
 
   /apollo-server-plugin-base/0.13.0_graphql@15.8.0:
@@ -1016,6 +1023,7 @@ packages:
       graphql: 15.8.0
     transitivePeerDependencies:
       - encoding
+      - supports-color
     dev: false
 
   /apollo-tracing/0.15.0_graphql@15.8.0:
@@ -1145,6 +1153,8 @@ packages:
       raw-body: 2.5.1
       type-is: 1.6.18
       unpipe: 1.0.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /brace-expansion/2.0.1:
@@ -1260,12 +1270,22 @@ packages:
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
     dependencies:
       ms: 2.0.0
     dev: false
 
   /debug/3.1.0:
     resolution: {integrity: sha512-OX8XqP7/1a9cqkxYw2yXss15f26NKWBpDXQd0/uK/KPqdQhxbPa994hnzjcE2VqQpDslf55723cKPUOGSmMY3g==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
     dependencies:
       ms: 2.0.0
     dev: false
@@ -1452,6 +1472,8 @@ packages:
       type-is: 1.6.18
       utils-merge: 1.0.1
       vary: 1.1.2
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /extend/3.0.2:
@@ -1482,6 +1504,8 @@ packages:
       parseurl: 1.3.3
       statuses: 2.0.1
       unpipe: 1.0.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /follow-redirects/1.15.1:
@@ -2421,6 +2445,8 @@ packages:
       on-finished: 2.4.1
       range-parser: 1.2.1
       statuses: 2.0.1
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /serve-static/1.15.0:
@@ -2431,6 +2457,8 @@ packages:
       escape-html: 1.0.3
       parseurl: 1.3.3
       send: 0.18.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /setprototypeof/1.2.0:
