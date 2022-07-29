@@ -50,7 +50,7 @@ module.exports = class Controller {
           this.processService(
             path.resolve(`${serviceDir}/${serviceFile}`),
             serviceFile.replace('.js', ''),
-            servicePath
+            servicesPath
           )
       })
     })
@@ -76,6 +76,14 @@ module.exports = class Controller {
       this.typeDefs.push(service.typeDefs)
       this.resolvers.push(service.resolvers)
       this.graphqlServices.push(serviceName)
+
+      const gqlServices = [
+        ...(service.resolvers.Query || []),
+        ...(service.resolvers.Mutation || [])
+      ]
+      gqlServices.forEach((service) => {
+        this.moduleMap[service] = module
+      })
     } else if (typeof service === 'function')
       this.routes.push({
         method: 'all',

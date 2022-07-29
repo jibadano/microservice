@@ -55,6 +55,9 @@ module.exports = class Monitor {
     let logData = typeof data == 'object' ? JSON.stringify(data) : data
     logData = logData && logData.indexOf('\n') > 0 ? '\n' + logData : logData
 
+    if (logData.length > Math.pow(2, 20))
+      data = logData.substring(0, Math.pow(2, 20))
+
     if (typeof trace == 'object' && trace._id) {
       //Is an update
       if (this.Trace)

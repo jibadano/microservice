@@ -76,16 +76,19 @@ class Microservice {
       if (req && req.body && req.body.operationName == 'IntrospectionQuery')
         return next()
 
+      const moduleName =
+        this.controller.moduleMap[
+          req.body.operationName || req.url.replace('/', '')
+        ]
+      if (!moduleName) return next()
+
       const trace = this.monitor.log(
         'Request',
         {
           operation: req.body.operationName,
           user: req.user && req.user.user && req.user.user._id,
           ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-          module:
-            this.controller.moduleMap[
-              req.body.operationName || req.path.replace('/', '')
-            ]
+          module: moduleName
         },
         req.body.query
       )
