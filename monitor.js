@@ -12,7 +12,7 @@ const MODES = {
 module.exports = class Monitor {
   constructor(config) {
     const monitorConfig = config.get('monitor')
-
+    this.module = config.get('name')
     if (!monitorConfig || monitorConfig.mode === MODES.OFF) {
       this.mode = MODES.OFF
     } else {
@@ -92,7 +92,7 @@ module.exports = class Monitor {
 
     trace._id = uuidv1()
     trace.date = Date.now()
-    trace.module = trace.module || config.get('name')
+    trace.module = trace.module || this.module
     trace.environment = process.env.NODE_ENV
     trace.logs = [
       {
