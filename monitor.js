@@ -92,6 +92,7 @@ module.exports = class Monitor {
 
     trace._id = uuidv1()
     trace.date = Date.now()
+    trace.module = trace.module || config.get('name')
     trace.environment = process.env.NODE_ENV
     trace.logs = [
       {
