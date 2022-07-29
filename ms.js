@@ -80,6 +80,7 @@ class Microservice {
         this.controller.moduleMap[
           req.body.operationName || req.url.replace('/', '')
         ]
+
       if (!moduleName) return next()
 
       const trace = this.monitor.log(

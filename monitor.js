@@ -13,11 +13,11 @@ module.exports = class Monitor {
   constructor(config) {
     const monitorConfig = config.get('monitor')
     this.module = config.get('name')
+
     if (!monitorConfig || monitorConfig.mode === MODES.OFF) {
       this.mode = MODES.OFF
     } else {
       const mongoPath = monitorConfig.mongo
-      this.module = config.moduleName
       if (mongoPath && monitorConfig.mode !== MODES.CONSOLE) {
         this.mode = MODES.DB
 
@@ -55,7 +55,7 @@ module.exports = class Monitor {
     let logData = typeof data == 'object' ? JSON.stringify(data) : data
     logData = logData && logData.indexOf('\n') > 0 ? '\n' + logData : logData
 
-    if (logData.length > Math.pow(2, 20))
+    if (logData && logData.length > Math.pow(2, 20))
       data = logData.substring(0, Math.pow(2, 20))
 
     if (typeof trace == 'object' && trace._id) {
@@ -67,7 +67,7 @@ module.exports = class Monitor {
         )
           .exec()
           .then((result) => {
-            if (!result.nModified) {
+            if (!result.modifiedCount) {
               setTimeout(() => {
                 this.Trace.updateOne(
                   { _id: trace._id },
