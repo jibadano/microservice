@@ -81,7 +81,11 @@ class Microservice {
         {
           operation: req.body.operationName,
           user: req.user && req.user.user && req.user.user._id,
-          ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+          ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+          module:
+            this.controller.moduleMap[
+              req.body.operationName || req.path.replace('/', '')
+            ]
         },
         req.body.query
       )

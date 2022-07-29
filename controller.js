@@ -34,6 +34,7 @@ module.exports = class Controller {
     this.routes = []
     this.schemaDirectives = {}
     this.graphqlServices = []
+    this.moduleMap = {}
 
     fs.readdirSync(__dirname + '/services').forEach((serviceFile) => {
       this.processService(
@@ -48,7 +49,8 @@ module.exports = class Controller {
         if (serviceFile !== 'index.js')
           this.processService(
             path.resolve(`${serviceDir}/${serviceFile}`),
-            serviceFile.replace('.js', '')
+            serviceFile.replace('.js', ''),
+            servicePath
           )
       })
     })
@@ -60,7 +62,7 @@ module.exports = class Controller {
     )
   }
 
-  processService(servicePath, serviceName) {
+  processService(servicePath, serviceName, module) {
     const service = require(servicePath)
 
     if (service.directives) {
@@ -90,5 +92,7 @@ module.exports = class Controller {
           handler: service[method]
         })
     })
+
+    this.moduleMap[serviceName] = module
   }
 }
