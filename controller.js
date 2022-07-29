@@ -78,9 +78,10 @@ module.exports = class Controller {
       this.graphqlServices.push(serviceName)
 
       const gqlServices = [
-        ...(service.resolvers.Query || []),
-        ...(service.resolvers.Mutation || [])
+        ...Object.keys(service.resolvers.Query || {}),
+        ...Object.keys(service.resolvers.Mutation || {})
       ]
+
       gqlServices.forEach((service) => {
         this.moduleMap[service] = module
       })
