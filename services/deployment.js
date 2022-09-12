@@ -1,16 +1,8 @@
 const { gql, ApolloError } = require('apollo-server')
 const { print } = require('graphql')
 const axios = require('axios').default
-const { createDeployment } = require('@vercel/client')
-const git = require('simple-git')
 const ms = require('..')
-
-const updateBase = () =>
-  git()
-    .silent(true)
-    .clone(config.get('deploy.remote'), `${process.env.PWD}/tmp/project`)
-    .then(() => console.log('finished'))
-    .catch((err) => console.error('failed: ', err))
+const config = require('@jibadano/config')
 
 const typeDefs = gql`
   extend type Query {
@@ -30,27 +22,50 @@ const typeDefs = gql`
   }
 `
 
-const vercelDeploy = async (deployment) => {
-  for await (const event of createDeployment(
-    {
-      token: config.get('deploy.token'),
-      path: `${process.env.PWD}/tmp/project`
-    },
-    {
-      project: 'web',
-      target: 'production',
-      projectSettings: {
-        framework: null
-      }
-    }
-  )) {
-    deployment.desc = event.type
-    if (event.type === 'ready') {
-      return
-    }
+const vercelDeployV2 = () => {
+  const urls = config.get('vercel.deploy.hooks') || []
+  urls.forEach((url) => {
+    axios.get(url)
+  })
+}
 
-    await deployment.save()
-  }
+const vercelStatusV2 = async (timeout = 32000) =>
+  new Promise((resolve) => {
+    setTimeout(async () => {
+      if (await checkVercelDeployStatusV2()) {
+        resolve(true)
+      } else {
+        resolve(await vercelStatusV2(parseInt(timeout / 2)))
+      }
+    }, timeout)
+  })
+
+const checkVercelDeployStatusV2 = async () => {
+  const urls = config.get('vercel.deploy.status') || []
+  const promises = []
+  urls.forEach((url) => {
+    promises.push(
+      new Promise((resolve, reject) => {
+        axios
+          .get(url, {
+            headers: {
+              Authorization: 'Bearer ' + config.get('vercel.deploy.token')
+            }
+          })
+          .then(({ data }) => {
+            let status = 'BUILDING'
+            if (data && data.deployments && data.deployments.length)
+              status = data.deployments.shift().state
+
+            return resolve(status)
+          })
+          .catch(reject)
+      })
+    )
+  })
+
+  const deploymentStatuses = await Promise.all(promises)
+  return deploymentStatuses.every((status) => status == 'READY')
 }
 
 const resolvers = {
@@ -84,7 +99,7 @@ const resolvers = {
         ).exec()
       }
 
-      const deployment = await new Deployment({
+      const deployment = await new ms.model.Deployment({
         settings
       }).save()
 
@@ -100,40 +115,42 @@ const resolvers = {
         promises.push(
           new Promise((resolve, reject) => {
             axios
-              .post(`${config.get('url', serviceName)}/graphql`, {
+              .post(config.get(`..services.${serviceName}.url`) + '/graphql', {
                 operationName: 'refreshSettings',
                 query: print(REFRESH_SETTINGS)
               })
               .then(resolve)
+              .catch(reject)
           })
         )
       )
 
-      updateBase().then(() => {
-        vercelDeploy(deployment).then(async () => {
-          deployment.status = 'ok'
-          await Config.findOneAndUpdate(
-            { _id: 'settings' },
-            { $set: { status: 'ok' } }
-          ).exec()
-          await Promise.all(promises)
+      await vercelDeployV2()
+      deployment.status = 'info'
+      await deployment.save()
+      const done = await vercelStatusV2()
+      deployment.status = done ? 'ok' : 'error'
 
-          Deployment.find()
-            .sort('-date')
-            .skip(config.get('deploy.max') || 32)
-            .exec()
-            .then(
-              (deployments) =>
-                deployments &&
-                deployments.length &&
-                Deployment.deleteMany({
-                  _id: { $in: deployments.map(({ _id }) => _id) }
-                })
-            )
+      await Promise.all(promises)
+      await Config.findOneAndUpdate(
+        { _id: 'settings' },
+        { $set: { status: deployment.status } }
+      ).exec()
 
-          await deployment.save()
-        })
-      })
+      Deployment.find()
+        .sort('-date')
+        .skip(config.get('deploy.max') || 32)
+        .exec()
+        .then(
+          (deployments) =>
+            deployments &&
+            deployments.length &&
+            Deployment.deleteMany({
+              _id: { $in: deployments.map(({ _id }) => _id) }
+            })
+        )
+
+      await deployment.save()
 
       return deployment
     }
