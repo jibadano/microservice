@@ -42,6 +42,8 @@ const vercelStatusV2 = async (timeout = 32000) =>
 
 const checkVercelDeployStatusV2 = async () => {
   const urls = config.get('vercel.deploy.status') || []
+  if (!urls.length) return true
+
   const promises = []
   urls.forEach((url) => {
     promises.push(
@@ -125,17 +127,15 @@ const resolvers = {
         )
       )
 
-      await vercelDeployV2()
-      deployment.status = 'info'
-      await deployment.save()
-      const done = await vercelStatusV2()
-      deployment.status = done ? 'ok' : 'error'
-
-      await Promise.all(promises)
-      await Config.findOneAndUpdate(
-        { _id: 'settings' },
-        { $set: { status: deployment.status } }
-      ).exec()
+      vercelDeployV2()
+      vercelStatusV2().then(async (done) => {
+        deployment.status = done ? 'ok' : 'error'
+        await Promise.all(promises)
+        await Config.findOneAndUpdate(
+          { _id: 'settings' },
+          { $set: { status: deployment.status } }
+        ).exec()
+      })
 
       Deployment.find()
         .sort('-date')
