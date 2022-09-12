@@ -135,6 +135,7 @@ const resolvers = {
           { _id: 'settings' },
           { $set: { status: deployment.status } }
         ).exec()
+        await deployment.save()
       })
 
       ms.model.Deployment.find()
