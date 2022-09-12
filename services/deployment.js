@@ -29,9 +29,10 @@ const vercelDeployV2 = () => {
   })
 }
 
-const vercelStatusV2 = async (timeout = 32000) =>
+const vercelStatusV2 = async (timeout = 64000) =>
   new Promise((resolve) => {
     setTimeout(async () => {
+      if (timeout <= 2000) return resolve(false)
       if (await checkVercelDeployStatusV2()) {
         resolve(true)
       } else {
@@ -131,7 +132,7 @@ const resolvers = {
       vercelStatusV2().then(async (done) => {
         deployment.status = done ? 'ok' : 'error'
         await Promise.all(promises)
-        await Config.findOneAndUpdate(
+        await ms.model.Config.findOneAndUpdate(
           { _id: 'settings' },
           { $set: { status: deployment.status } }
         ).exec()
