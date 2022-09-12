@@ -29,7 +29,7 @@ const vercelDeployV2 = () => {
   })
 }
 
-const vercelStatusV2 = async (timeout = 64000) =>
+const vercelStatusV2 = async (timeout = 128000) =>
   new Promise((resolve) => {
     setTimeout(async () => {
       if (timeout <= 2000) return resolve(false)
