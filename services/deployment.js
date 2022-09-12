@@ -137,7 +137,7 @@ const resolvers = {
         ).exec()
       })
 
-      Deployment.find()
+      ms.model.Deployment.find()
         .sort('-date')
         .skip(config.get('deploy.max') || 32)
         .exec()
@@ -145,7 +145,7 @@ const resolvers = {
           (deployments) =>
             deployments &&
             deployments.length &&
-            Deployment.deleteMany({
+            ms.model.Deployment.deleteMany({
               _id: { $in: deployments.map(({ _id }) => _id) }
             })
         )
