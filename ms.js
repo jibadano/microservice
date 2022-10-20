@@ -18,7 +18,14 @@ class Microservice {
   }
 
   async init() {
-    await initConfig()
+    try {
+      await initConfig()
+    } catch (e) {
+      console.error(
+        'No config found, you must specify a CONFIG_URL variable or a config.json file'
+      )
+      return process.exit(0)
+    }
     const config = require('@jibadano/config')
 
     this.monitor = new Monitor(config)

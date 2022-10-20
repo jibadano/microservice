@@ -1,6 +1,6 @@
 {
   "name": "@jibadano/microservice",
-  "version": "0.3.35",
+  "version": "0.3.36",
   "main": "index.js",
   "scripts": {},
   "keywords": [],
@@ -8,7 +8,6 @@
   "license": "ISC",
   "dependencies": {
     "@jibadano/config": "0.0.9",
-    "@types/node-fetch": "2",
     "apollo-server": "^3.10.0",
     "apollo-server-express": "^2.15.1",
     "axios": "^0.27.2",
