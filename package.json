@@ -1,16 +1,15 @@
 {
   "name": "@jibadano/microservice",
-  "version": "0.3.36",
+  "version": "0.4.0",
   "main": "index.js",
   "scripts": {},
   "keywords": [],
   "author": "jibadano@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "@jibadano/config": "0.0.9",
+    "@jibadano/config": "0.0.11",
     "apollo-server": "^3.10.0",
     "apollo-server-express": "^2.15.1",
-    "axios": "^0.27.2",
     "body-parser": "^1.20.0",
     "express": "^4.18.1",
     "express-jwt": "^5.3.3",
@@ -19,8 +18,8 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "mongoose": "6.4.6",
+    "node-fetch": "^2.6.7",
     "nodemailer": "^6.7.7",
-    "request": "^2.88.2",
     "uuid": "^8.3.2"
   },
   "repository": {

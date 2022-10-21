@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer')
-const request = require('request')
+const fetch = require('node-fetch')
+const URLSearchParams = require('url').URLSearchParams
 
 module.exports = class Mail {
   constructor(config) {
@@ -29,17 +30,15 @@ module.exports = class Mail {
       if (!to || !template)
         return console.error(`📧 Mail to or template name not provided`)
       return new Promise((resolve, reject) => {
-        request(
-          this.baseUrl,
-          { qs: { vr: 'email', template, ...data } },
-          (err, res) => {
-            if (err || !res.body) {
-              const message = `📧 Mail template not found ${template}`
-              console.error(message)
-              return reject(new Error(message))
-            }
-
-            let subjectTag = res.body.match(/SUBJECT_.*_SUBJECT/)
+        fetch(
+          this.baseUrl +
+            '?' +
+            new URLSearchParams({ vr: 'email', template, ...data }),
+          { method: 'get' }
+        )
+          .then((res) => res.text())
+          .then((body) => {
+            let subjectTag = body.match(/SUBJECT_.*_SUBJECT/)
             subjectTag = subjectTag && subjectTag[0]
 
             if (!subjectTag) return reject(new Error('Subject not found'))
@@ -48,12 +47,12 @@ module.exports = class Mail {
               .replace('SUBJECT_', '')
               .replace('_SUBJECT', '')
 
-            const start = res.body.indexOf('BODY_')
-            const end = res.body.indexOf('_BODY')
+            const start = body.indexOf('BODY_')
+            const end = body.indexOf('_BODY')
             if (start == -1 || end == -1)
               return reject(new Error('Body not found'))
 
-            let html = res.body.slice(start + 5, end)
+            let html = body.slice(start + 5, end)
 
             this.transport
               .sendMail({
@@ -67,8 +66,12 @@ module.exports = class Mail {
                 console.error('MAIL ERROR!', err)
                 return reject(err)
               })
-          }
-        )
+          })
+          .catch((e) => {
+            const message = `📧 Mail template not found ${template}`
+            console.error(message, e)
+            return reject(new Error(message))
+          })
       })
     }
 

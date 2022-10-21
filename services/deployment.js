@@ -1,6 +1,6 @@
 const { gql, ApolloError } = require('apollo-server')
 const { print } = require('graphql')
-const axios = require('axios').default
+const fetch = require('node-fetch')
 const ms = require('..')
 const config = require('@jibadano/config')
 
@@ -25,7 +25,7 @@ const typeDefs = gql`
 const vercelDeployV2 = () => {
   const urls = config.get('vercel.deploy.hooks') || []
   urls.forEach((url) => {
-    axios.get(url)
+    fetch(url, { method: 'get' })
   })
 }
 
@@ -49,13 +49,14 @@ const checkVercelDeployStatusV2 = async () => {
   urls.forEach((url) => {
     promises.push(
       new Promise((resolve, reject) => {
-        axios
-          .get(url, {
-            headers: {
-              Authorization: 'Bearer ' + config.get('vercel.deploy.token')
-            }
-          })
-          .then(({ data }) => {
+        fetch(url, {
+          method: 'get',
+          headers: {
+            Authorization: 'Bearer ' + config.get('vercel.deploy.token')
+          }
+        })
+          .then((res) => res.json())
+          .then((data) => {
             let status = 'BUILDING'
             if (data && data.deployments && data.deployments.length)
               status = data.deployments.shift().state
@@ -117,11 +118,16 @@ const resolvers = {
       serviceNames.forEach((serviceName) =>
         promises.push(
           new Promise((resolve, reject) => {
-            axios
-              .post(config.get(`..services.${serviceName}.url`) + '/graphql', {
+            fetch(config.get(`..services.${serviceName}.url`) + '/graphql', {
+              method: 'post',
+              body: JSON.stringify({
                 operationName: 'refreshSettings',
                 query: print(REFRESH_SETTINGS)
-              })
+              }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
               .then(resolve)
               .catch(reject)
           })
