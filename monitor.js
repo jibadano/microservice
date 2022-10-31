@@ -1,7 +1,24 @@
 const mongoose = require('mongoose')
 const moment = require('moment')
-const { v1: uuidv1 } = require('uuid')
-const TraceSchema = require('./model/trace')
+const uuidv1 = require('uuid/v1')
+
+const TraceSchema = new mongoose.Schema({
+  _id: String,
+  user: String,
+  operation: String,
+  ip: String,
+  module: String,
+  date: { type: Date, default: Date.now },
+  environment: String,
+  logs: [
+    {
+      timestamp: { type: Date, default: Date.now },
+      message: String,
+      data: mongoose.Schema.Types.Mixed,
+      type: { type: String, enum: ['log', 'info', 'error', 'warning'] }
+    }
+  ]
+})
 
 const MODES = {
   OFF: 'off',
@@ -12,15 +29,14 @@ const MODES = {
 module.exports = class Monitor {
   constructor(config) {
     const monitorConfig = config.get('monitor')
-    this.module = config.get('name')
 
     if (!monitorConfig || monitorConfig.mode === MODES.OFF) {
       this.mode = MODES.OFF
     } else {
       const mongoPath = monitorConfig.mongo
+      this.module = config.moduleName
       if (mongoPath && monitorConfig.mode !== MODES.CONSOLE) {
         this.mode = MODES.DB
-
         const monitorConnection = mongoose.createConnection(mongoPath, {
           useNewUrlParser: true,
           useUnifiedTopology: true
@@ -55,9 +71,6 @@ module.exports = class Monitor {
     let logData = typeof data == 'object' ? JSON.stringify(data) : data
     logData = logData && logData.indexOf('\n') > 0 ? '\n' + logData : logData
 
-    if (logData && logData.length > Math.pow(2, 20))
-      data = logData.substring(0, Math.pow(2, 20))
-
     if (typeof trace == 'object' && trace._id) {
       //Is an update
       if (this.Trace)
@@ -67,7 +80,7 @@ module.exports = class Monitor {
         )
           .exec()
           .then((result) => {
-            if (!result.modifiedCount) {
+            if (!result.nModified) {
               setTimeout(() => {
                 this.Trace.updateOne(
                   { _id: trace._id },
@@ -92,7 +105,7 @@ module.exports = class Monitor {
 
     trace._id = uuidv1()
     trace.date = Date.now()
-    trace.module = trace.module || this.module
+    trace.module = this.module
     trace.environment = process.env.NODE_ENV
     trace.logs = [
       {

@@ -1,26 +1,28 @@
 {
   "name": "@jibadano/microservice",
-  "version": "0.4.0",
-  "main": "index.js",
+  "version": "0.1.99",
+  "main": "src/index.js",
   "scripts": {},
   "keywords": [],
   "author": "jibadano@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "@jibadano/config": "0.0.11",
-    "apollo-server": "^3.10.0",
+    "apollo-server": "^2.15.1",
     "apollo-server-express": "^2.15.1",
-    "body-parser": "^1.20.0",
-    "express": "^4.18.1",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
     "express-jwt": "^5.3.3",
-    "graphql": "^15.0.0",
+    "graphql": "^15.2.0",
     "jsonwebtoken": "^8.3.0",
-    "lodash": "^4.17.21",
-    "moment": "^2.29.4",
-    "mongoose": "6.4.6",
-    "node-fetch": "^2.6.7",
-    "nodemailer": "^6.7.7",
-    "uuid": "^8.3.2"
+    "lodash": "^4.17.11",
+    "moment": "^2.29.1",
+    "mongoose": "^5.1.4",
+    "nodemailer": "^6.4.6",
+    "request": "^2.88.2",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.5"
   },
   "repository": {
     "type": "git",
@@ -29,5 +31,6 @@
   "bugs": {
     "url": "https://github.com/jibadano/microservice/issues"
   },
-  "homepage": "https://github.com/jibadano/microservice#readme"
+  "homepage": "https://github.com/jibadano/microservice#readme",
+  "description": ""
 }

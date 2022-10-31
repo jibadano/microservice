@@ -1,30 +1,26 @@
 const fs = require('fs')
 const path = require('path')
-
+const DEFAULT_PATH = 'src/context'
 module.exports = class Context {
   constructor(config) {
-    const contextPaths = config.get('selectedServices')
+    const contextPath = config.get('context.path') || DEFAULT_PATH
 
     this.handlers = []
 
+    const contextDir = process.env.PWD + '/' + contextPath
     try {
-      contextPaths.forEach((contextPath) => {
-        const contextDir = './' + contextPath + '/context'
-        fs.readdirSync(contextDir).forEach((contextFile) => {
-          const contextName = contextFile.replace('.js', '')
+      fs.readdirSync(contextDir).forEach((contextFile) => {
+        const contextName = contextFile.replace('.js', '')
 
-          if (contextFile !== 'index.js') {
-            const context = require(path.resolve(
-              `${contextDir}/${contextFile}`
-            ))
+        if (contextFile !== 'index.js') {
+          const context = require(path.resolve(`${contextDir}/${contextFile}`))
 
-            if (typeof context === 'function')
-              this.handlers.push({
-                name: contextName,
-                handler: context
-              })
-          }
-        })
+          if (typeof context === 'function')
+            this.handlers.push({
+              name: contextName,
+              handler: context
+            })
+        }
       })
     } catch (e) {}
 
