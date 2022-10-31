@@ -10,7 +10,7 @@ const MODES = {
 }
 
 module.exports = class Monitor {
-  constructor(config) {
+  async init(config) {
     const monitorConfig = config.get('monitor')
     this.module = config.get('name')
 
@@ -21,7 +21,7 @@ module.exports = class Monitor {
       if (mongoPath && monitorConfig.mode !== MODES.CONSOLE) {
         this.mode = MODES.DB
 
-        const monitorConnection = mongoose.createConnection(mongoPath, {
+        const monitorConnection = await mongoose.createConnection(mongoPath, {
           useNewUrlParser: true,
           useUnifiedTopology: true
         })
@@ -34,7 +34,7 @@ module.exports = class Monitor {
           if (monitorConfig.exp.amount) amount = monitorConfig.exp.amount
           if (monitorConfig.exp.unit) unit = monitorConfig.exp.unit
 
-          this.Trace.deleteMany({
+          await this.Trace.deleteMany({
             date: {
               $lte: moment().subtract(parseInt(amount), unit).toDate()
             }

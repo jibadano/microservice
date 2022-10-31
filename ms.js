@@ -29,7 +29,10 @@ class Microservice {
     const config = require('@jibadano/config')
 
     this.monitor = new Monitor(config)
+    await this.monitor.init(config)
+
     this.model = new Model(config)
+    await this.model.init(config)
     this.controller = new Controller(config)
     this.context = new Context(config)
     this.middleware = new Middleware(config)

@@ -10,12 +10,15 @@ const getSchemaName = (schemaFile) => {
   return schemaName
 }
 module.exports = class Model {
-  constructor(config) {
+  async init(config) {
     const modelPaths = config.get('selectedServices')
-    const modelConnection = mongoose.createConnection(config.get('mongo'), {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    })
+    const modelConnection = await mongoose.createConnection(
+      config.get('mongo'),
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      }
+    )
     const schemas = []
     try {
       fs.readdirSync(__dirname + '/model').forEach((schemaFile) => {
